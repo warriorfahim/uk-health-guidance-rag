@@ -20,7 +20,7 @@ def test_chunks_overlap():
 def test_all_words_are_covered():
     words = [str(i) for i in range(53)]
     chunks = chunk_text(" ".join(words), size=10, overlap=3)
-    covered = set(w for c in chunks for w in c.split())
+    covered = {w for c in chunks for w in c.split()}
     assert covered == set(words)
 
 

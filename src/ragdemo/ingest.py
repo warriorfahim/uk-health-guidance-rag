@@ -21,8 +21,7 @@ def main(raw_dir: str = "data/raw", out_path: str = "data/chunks.jsonl",
     if not records:
         sys.exit(f"No .txt files found in {raw_dir}. Add cleaned pages first.")
     with open(out_path, "w", encoding="utf-8") as f:
-        for r in records:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        f.writelines(json.dumps(r, ensure_ascii=False) + "\n" for r in records)
     print(f"Wrote {len(records)} chunks from {raw_dir} to {out_path}")
 
 

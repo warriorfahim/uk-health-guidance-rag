@@ -1,5 +1,5 @@
 """Build a grounded prompt and call an LLM of your choice."""
-from typing import Callable
+from collections.abc import Callable
 
 SYSTEM_RULES = (
     "Answer the question using ONLY the numbered sources below. "
