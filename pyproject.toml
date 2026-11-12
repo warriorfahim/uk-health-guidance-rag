@@ -1,0 +1,19 @@
+[project]
+name = "ragdemo"
+version = "0.1.0"
+description = "Semantic search and RAG demo over public UK health guidance"
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
