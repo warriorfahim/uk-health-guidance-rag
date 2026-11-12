@@ -5,3 +5,4 @@ data/raw/
 data/chunks.jsonl
 data/index.faiss
 .DS_Store
+rag_demo/
