@@ -1,7 +1,7 @@
 """Streamlit interface: search, answer and show sources."""
 import streamlit as st
 
-from ragdemo.answer import answer, build_prompt
+from ragdemo.answer import answer
 from ragdemo.retrieve import Retriever
 
 st.title("UK health guidance search")
