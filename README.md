@@ -9,12 +9,12 @@ It retrieves the most relevant passages for a question, answers using only those
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
 2. Embeds the chunks with an open-source sentence-transformers model and stores them in a FAISS index.
 3. Retrieves the top-k chunks for a query (semantic search).
-4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources.
+4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources. The Streamlit app sends it to a model hosted by Hugging Face when `HF_TOKEN` is set.
 5. Evaluates retrieval on a hand-written question set (hit rate at k).
 
 ## Project layout
 ```
-src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, evaluate
+src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, llm, evaluate
 app.py         Streamlit interface
 tests/         unit tests (run in CI, no model downloads needed)
 data/raw/      cleaned .txt guidance pages (not committed; `fetch` can create these)
@@ -45,6 +45,15 @@ streamlit run app.py
 - `fetch` downloads each path left in `data/sources.txt` from the Content API, converts the HTML to plain text, and saves `data/raw/<slug>.txt` plus `data/raw/manifest.csv` (source, title, url, updated, licence). Options: `--sources`, `--raw-dir`.
 
 Pages with fewer than 100 words (for example PDF-only or collection pages) and failed requests are skipped and listed at the end. Requests are throttled to stay well under the API rate limit. The manifest records the licence as OGL v3.0; check each page's own licence before relying on it.
+
+## Connecting an LLM
+`ragdemo.llm.make_hf_generate()` returns a `generate(prompt) -> str` function that calls a model hosted by Hugging Face (Inference Providers) through `huggingface_hub`. `app.py` uses it automatically when a token is set:
+```powershell
+$env:HF_TOKEN = "hf_..."          # free access token from huggingface.co/settings/tokens
+$env:HF_MODEL = "Qwen/Qwen2.5-7B-Instruct"   # optional; this is the default
+streamlit run app.py
+```
+Without `HF_TOKEN`, the app still runs and shows the grounded prompt instead of an answer. Free usage is rate limited, and which models are available can change; if the default fails, set `HF_MODEL` to another instruct model. Retrieved text is sent to Hugging Face's servers. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM, and answer quality is not yet evaluated.
 
 ## Evaluation
 `eval/eval_questions.csv` holds 20 to 30 questions with the expected source file.
