@@ -1,0 +1,34 @@
+# One GOV.UK path per line. Delete the ones you don't want.
+# Anything after a # is ignored.
+/guidance/ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations    # Ebola and Marburg haemorrhagic fevers: outbreaks and case locations
+/guidance/pertussis-clinical-and-public-health-management    # Pertussis: background information on prevention and management
+/guidance/chikungunya    # Chikungunya
+/guidance/severe-fever-with-thrombocytopaenia-syndrome-sfts-epidemiology-outbreaks-and-guidance    # Severe fever with thrombocytopaenia syndrome (SFTS): epidemiology, outbreaks and guidance
+/guidance/report-an-outbreak-of-acute-respiratory-infection-in-an-adult-social-care-setting    # Report an outbreak of acute respiratory infection in an adult social care setting
+/guidance/tick-borne-encephalitis-epidemiology-diagnosis-and-prevention    # Tick-borne encephalitis: epidemiology, diagnosis and prevention
+/guidance/lassa-fever-origins-reservoirs-transmission-and-guidelines    # Lassa fever: origins, reservoirs, transmission and guidelines
+/guidance/diphtheria-migrant-health-guide    # Diphtheria: migrant health guide
+/guidance/vaccination-in-pregnancy-vip    # Inadvertent vaccination in pregnancy (VIP)
+/guidance/hantaviruses    # Hantaviruses
+/guidance/national-contingency-plan-for-invasive-aedes-mosquitoes-in-england    # National contingency plan for invasive Aedes mosquitoes in England
+/guidance/national-contingency-plan-for-west-nile-virus-in-england    # National contingency plan for West Nile Virus in England
+/guidance/mers-cov-background-information    # MERS-CoV: background information
+/guidance/antimicrobial-resistance-amr    # Antimicrobial resistance (AMR) in VDEC
+/guidance/hepatitis-b-migrant-health-guide    # Hepatitis B: migrant health guide
+/guidance/hepatitis-c-migrant-health-guide    # Hepatitis C: migrant health guide
+/guidance/anthrax-guidance-for-testing    # Anthrax: guidance for testing
+/guidance/nipah-virus-epidemiology-outbreaks-and-guidance    # Nipah virus: epidemiology, outbreaks and guidance
+/guidance/health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus    # Health advice for women returning from areas with a risk of Zika virus
+/guidance/immunisation-migrant-health-guide    # Immunisation: migrant health guide
+/guidance/meningococcal-disease-background-information    # Meningococcal disease: background information
+/guidance/travel-to-visit-friends-and-relatives-migrant-health-guide    # Travel to visit friends and relatives: migrant health guide
+/guidance/poliomyelitis-and-post-polio-syndrome-migrant-health-guide    # Poliomyelitis and post-polio syndrome: migrant health guide
+/guidance/gumcad-sti-surveillance-system    # GUMCAD STI Surveillance System
+/guidance/plague-epidemiology-outbreaks-and-guidance    # Plague: epidemiology, outbreaks and guidance
+/guidance/universal-varicella-vaccination-programme-in-england    # Universal varicella vaccination programme in England: surveillance
+/guidance/oropouche-virus-disease    # Oropouche virus disease
+/guidance/crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines    # Crimean-Congo haemorrhagic fever: origins, reservoirs, transmission and guidelines
+/guidance/people-who-inject-drugs-infection-risks-guidance-and-data    # People who inject drugs: infection risks, guidance and data
+/guidance/supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-professionals    # Supporting vulnerable people before and during cold weather: for healthcare professionals
+/guidance/notifiable-organisms-and-how-to-report-them    # Notifiable organisms and how to report them
+/guidance/mmr-catchup-programme-diagnosis-case-management-and-advice    # MMR catchup programme: diagnosis, case management, and advice
