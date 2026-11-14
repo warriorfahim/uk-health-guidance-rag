@@ -47,13 +47,23 @@ streamlit run app.py
 Pages with fewer than 100 words (for example PDF-only or collection pages) and failed requests are skipped and listed at the end. Requests are throttled to stay well under the API rate limit. The manifest records the licence as OGL v3.0; check each page's own licence before relying on it.
 
 ## Connecting an LLM
-`ragdemo.llm.make_hf_generate()` returns a `generate(prompt) -> str` function that calls a model hosted by Hugging Face (Inference Providers) through `huggingface_hub`. `app.py` uses it automatically when a token is set:
+`app.py` retrieves the top 3 chunks and sends one grounded prompt (replies capped at 400 tokens) to an LLM chosen by `LLM_BACKEND`:
+
+**Local Ollama (default).** Runs `qwen2.5:7b` on your machine, so no data leaves it and there are no API costs.
 ```powershell
-$env:HF_TOKEN = "hf_..."          # free access token from huggingface.co/settings/tokens
-$env:HF_MODEL = "meta-llama/Llama-3.1-8B-Instruct"   # optional; this is the default
+# install Ollama from ollama.com, then:
+ollama pull qwen2.5:7b
 streamlit run app.py
 ```
-Without `HF_TOKEN`, the app still runs and shows the grounded prompt instead of an answer. Free usage is rate limited, and which models are available can change; if the default fails, set `HF_MODEL` to another instruct model. Retrieved text is sent to Hugging Face's servers. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM, and answer quality is not yet evaluated.
+Override with `OLLAMA_MODEL` or `OLLAMA_URL` (default `http://localhost:11434`). Answers on CPU can take a while.
+
+**Hugging Face Inference Providers (optional).** `$env:LLM_BACKEND = "hf"` plus `$env:HF_TOKEN = "hf_..."`; the model defaults to `meta-llama/Llama-3.1-8B-Instruct` (override with `HF_MODEL`). This is a paid per-use service (the free allowance is small and calls can fail with 402 Payment Required), and retrieved text is sent to Hugging Face's servers.
+
+**OpenRouter (optional).** `$env:LLM_BACKEND = "openrouter"` plus `$env:OPENROUTER_API_KEY = "sk-or-..."`; the model defaults to `baidu/ernie-5.5-flash-preview:free` (override with `OPENROUTER_MODEL`; check the current ID on openrouter.ai/models, as free preview models change). Free models can be rate limited (HTTP 429), and retrieved text is sent to OpenRouter and its model provider.
+
+The app's sidebar has an "LLM backend" selector, so you can switch between Ollama and OpenRouter without restarting; `LLM_BACKEND` sets the initial choice.
+
+If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM, and answer quality is not yet evaluated.
 
 ## Evaluation
 `eval/eval_questions.csv` holds 20 to 30 questions with the expected source file.
