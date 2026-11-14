@@ -1,7 +1,7 @@
 """Hugging Face hosted LLM (Inference Providers) as a `generate(prompt) -> str` callable."""
 import os
 
-DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+DEFAULT_MODEL = "meta-llama/Llama-3.1-8B-Instruct"
 
 
 def make_hf_generate(
