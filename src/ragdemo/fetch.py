@@ -30,7 +30,7 @@ SKIP_TAGS = {"script", "style", "nav", "footer"}
 
 
 class _TextExtractor(HTMLParser):
-    """Turn GOV.UK body HTML into readable text, keeping headings and list items on their own lines."""
+    """Turn GOV.UK body HTML into readable text, one heading or list item per line."""
 
     def __init__(self):
         super().__init__()
@@ -78,8 +78,10 @@ def extract_body(item: dict) -> str:
     """
     details = item.get("details", {})
     body = details.get("body")
-    if isinstance(body, list):  # some schemas return [{"content_type": "text/html", "content": ...}]
-        body = next((b.get("content", "") for b in body if b.get("content_type") == "text/html"), "")
+    if isinstance(body, list):  # some schemas return [{"content_type": ..., "content": ...}]
+        body = next(
+            (b.get("content", "") for b in body if b.get("content_type") == "text/html"), ""
+        )
     if body:
         return body
     parts = details.get("parts") or []
@@ -92,7 +94,8 @@ def slugify(path: str) -> str:
 
 
 def _get_json(url: str) -> dict:
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.load(resp)
 
@@ -107,7 +110,8 @@ def discover(org: str, doc_types: list[str], query: str, count: int, out_path: P
     results = _get_json(url).get("results", [])
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
-        f.write("# One GOV.UK path per line. Delete the ones you don't want. Lines starting with # are ignored.\n")
+        f.write("# One GOV.UK path per line. Delete the ones you don't want.\n")
+        f.write("# Anything after a # is ignored.\n")
         f.writelines(f"{r['link']}    # {r.get('title', '')}\n" for r in results)
     print(f"Wrote {len(results)} candidate paths to {out_path}")
 
@@ -132,7 +136,8 @@ def fetch(sources_path: Path, raw_dir: Path, delay: float = 0.3, min_words: int 
             continue
         text = html_to_text(extract_body(item))
         if len(text.split()) < min_words:
-            skipped.append((path, f"only {len(text.split())} words (probably a PDF-only or collection page)"))
+            words = len(text.split())
+            skipped.append((path, f"only {words} words (probably a PDF-only or collection page)"))
             continue
         name = f"{slugify(path)}.txt"
         title = item.get("title", "")
@@ -151,7 +156,9 @@ def fetch(sources_path: Path, raw_dir: Path, delay: float = 0.3, min_words: int 
 
 
 def main(argv=None) -> None:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     sub = ap.add_subparsers(dest="cmd", required=True)
     d = sub.add_parser("discover", help="list candidate pages via the GOV.UK Search API")
     d.add_argument("--org", default="uk-health-security-agency")
@@ -165,7 +172,8 @@ def main(argv=None) -> None:
     f.add_argument("--raw-dir", default="data/raw")
     args = ap.parse_args(argv)
     if args.cmd == "discover":
-        discover(args.org, args.doc_types or ["detailed_guide"], args.query, args.count, Path(args.out))
+        doc_types = args.doc_types or ["detailed_guide"]
+        discover(args.org, doc_types, args.query, args.count, Path(args.out))
     else:
         if not Path(args.sources).exists():
             sys.exit(f"{args.sources} not found. Run discover first or write the paths yourself.")
