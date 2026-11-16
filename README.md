@@ -9,7 +9,7 @@ It retrieves the most relevant passages for a question, answers using only those
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
 2. Embeds the chunks with an open-source sentence-transformers model and stores them in a FAISS index.
 3. Retrieves the top-k chunks for a query (semantic search).
-4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources. The Streamlit app sends it to a model hosted by Hugging Face when `HF_TOKEN` is set.
+4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources. The Streamlit app sends it to a local Ollama model by default (`qwen2.5:7b`), or to OpenRouter or Hugging Face if you pick one of those (see "Connecting an LLM").
 5. Evaluates retrieval on a hand-written question set (hit rate at k).
 
 ## Project layout
