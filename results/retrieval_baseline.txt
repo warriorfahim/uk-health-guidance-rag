@@ -1,0 +1,13 @@
+# Retrieval baseline, run on 2026-11-16; index built 2026-11-13
+# command: python -m ragdemo.evaluate --misses
+# chunk size=200 words, overlap=40, model=all-MiniLM-L6-v2, 330 chunks, 32 pages, 51 questions
+
+
+Hit@1: 0.90
+Hit@3: 0.98
+Hit@5: 0.98
+
+Missed at k=5: 1 of 51
+- At what ages do children get the combined measles, mumps, rubella and chickenpox jab from 2026?
+    expected: universal-varicella-vaccination-programme-in-england.txt
+    got:      mmr-catchup-programme-diagnosis-case-management-and-advice.txt, mmr-catchup-programme-diagnosis-case-management-and-advice.txt, mmr-catchup-programme-diagnosis-case-management-and-advice.txt, pertussis-clinical-and-public-health-management.txt, mmr-catchup-programme-diagnosis-case-management-and-advice.txt

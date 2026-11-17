@@ -1,6 +1,7 @@
 """LLM backends as `generate(prompt) -> str` callables: local Ollama (default), OpenRouter or Hugging Face."""
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 
@@ -74,18 +75,34 @@ def make_ollama_generate(
     return generate
 
 
+def _retry_delay(exc: urllib.error.HTTPError, retry_wait: float, attempt: int) -> float:
+    """Seconds to wait before retrying a rate-limited call (at most 60)."""
+    header = exc.headers.get("Retry-After") if exc.headers else None
+    try:
+        wait = float(header) if header else retry_wait * (attempt + 1)
+    except ValueError:
+        wait = retry_wait * (attempt + 1)
+    return min(wait, 60.0)
+
+
 def make_openrouter_generate(
     model: str | None = None,
     api_key: str | None = None,
     max_tokens: int = 400,
     temperature: float = 0.1,
     timeout: float = 120.0,
+    retries: int = 4,
+    retry_wait: float = 15.0,
 ):
     """Return a `generate` function that calls OpenRouter (standard library only).
 
     The key is read from `api_key`, then the OPENROUTER_API_KEY environment variable. Model comes
     from `model`, then OPENROUTER_MODEL, then OPENROUTER_DEFAULT_MODEL. Note that the question and
     retrieved passages are sent to a third party.
+
+    A rate-limited call (HTTP 429) is retried up to `retries` times. Each wait is the server's
+    Retry-After header if it sends one, otherwise `retry_wait` seconds times the attempt number,
+    and never more than 60 seconds.
     """
     api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -104,12 +121,17 @@ def make_openrouter_generate(
             data=body,
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
         )
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
-                data = json.load(resp)
-        except urllib.error.HTTPError as exc:
-            hint = " (rate limited; try again shortly)" if exc.code == 429 else ""
-            raise RuntimeError(f"OpenRouter returned HTTP {exc.code}{hint}") from exc
+        for attempt in range(retries + 1):
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                    data = json.load(resp)
+                break
+            except urllib.error.HTTPError as exc:
+                if exc.code == 429 and attempt < retries:
+                    time.sleep(_retry_delay(exc, retry_wait, attempt))
+                    continue
+                hint = " (rate limited; try again shortly)" if exc.code == 429 else ""
+                raise RuntimeError(f"OpenRouter returned HTTP {exc.code}{hint}") from exc
         content = (data.get("choices") or [{}])[0].get("message", {}).get("content")
         if not content:
             raise RuntimeError("OpenRouter returned an empty answer")

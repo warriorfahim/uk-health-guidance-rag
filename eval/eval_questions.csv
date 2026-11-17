@@ -1,2 +1,52 @@
 question,expected_source
-"Example question about a topic covered by one page?",example_page.txt
+"What are the different forms anthrax can take in a patient, depending on how they were exposed?",anthrax-guidance-for-testing.txt
+"Which anthrax outbreak affected drug users in the UK around 2009 to 2012?",anthrax-guidance-for-testing.txt
+"Which UKHSA research centre works on new treatments and vaccines for drug-resistant infections?",antimicrobial-resistance-amr.txt
+"Where does the name chikungunya come from and what does it mean?",chikungunya.txt
+"Can chikungunya be confused with dengue when a patient has fever and sore joints?",chikungunya.txt
+"Which ticks are the main carriers of Crimean-Congo haemorrhagic fever and are they established in Britain?",crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt
+"Roughly how many people die from Crimean-Congo fever around the world each year?",crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt
+"Why are chronic skin wounds in people who have recently arrived in the UK relevant to diphtheria?",diphtheria-migrant-health-guide.txt
+"Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?",diphtheria-migrant-health-guide.txt
+"Which Ebola virus caused the 2026 outbreak in eastern DRC and Uganda that WHO declared an international emergency?",ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt
+"What scheme should companies register with if their staff work in areas affected by Ebola or Marburg?",ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt
+"How often do sexual health clinics in England have to send their data to UKHSA for the national STI surveillance system?",gumcad-sti-surveillance-system.txt
+"Which hantavirus is treated as an airborne high consequence infection in the UK because it can pass between people?",hantaviruses.txt
+"How do the death rates compare for the kidney-related and the lung-related hantavirus illnesses?",hantaviruses.txt
+"I have just come back from a country with Zika and I might be pregnant. What should I do?",health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt
+"What proportion of babies born to mothers infected with Zika in pregnancy end up with problems?",health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt
+"What extra care does a newborn need if the mother is living with hepatitis B?",hepatitis-b-migrant-health-guide.txt
+"How many people in the world are living with long-term hepatitis C and which region has the most?",hepatitis-c-migrant-health-guide.txt
+"Does a new arrival need proof of address or immigration status to register with a GP and get vaccinated?",immunisation-migrant-health-guide.txt
+"If a child moved to the UK halfway through a vaccine course, do they have to start again?",immunisation-migrant-health-guide.txt
+"Which animal spreads Lassa fever to people?",lassa-fever-origins-reservoirs-transmission-and-guidelines.txt
+"How was Lassa virus first identified and why is it called that?",lassa-fever-origins-reservoirs-transmission-and-guidelines.txt
+"Which kind of rash should make me worry that someone has meningitis or blood poisoning?",meningococcal-disease-background-information.txt
+"Which age groups and health conditions make meningococcal disease more likely?",meningococcal-disease-background-information.txt
+"Which animal passes MERS to humans?",mers-cov-background-information.txt
+"Which country has reported the majority of MERS cases since 2012?",mers-cov-background-information.txt
+"How can measles, mumps or rubella be confirmed without taking a blood sample?",mmr-catchup-programme-diagnosis-case-management-and-advice.txt
+"Who is most at risk of catching measles at the moment?",mmr-catchup-programme-diagnosis-case-management-and-advice.txt
+"Which animals are the natural hosts of Nipah virus?",nipah-virus-epidemiology-outbreaks-and-guidance.txt
+"Where and when was Nipah virus first recognised in people?",nipah-virus-epidemiology-outbreaks-and-guidance.txt
+"Which laboratories must report notifiable organisms and who do they report to?",notifiable-organisms-and-how-to-report-them.txt
+"What is the current name of the yeast that used to be called Candida auris?",notifiable-organisms-and-how-to-report-them.txt
+"Which insects transmit Oropouche virus?",oropouche-virus-disease.txt
+"Is there a vaccine or antiviral drug for Oropouche fever?",oropouche-virus-disease.txt
+"What survey is the main source of data on infections among people who inject drugs?",people-who-inject-drugs-infection-risks-guidance-and-data.txt
+"Can whooping cough be diagnosed without a laboratory test?",pertussis-clinical-and-public-health-management.txt
+"What testing option exists for school-age children with suspected whooping cough?",pertussis-clinical-and-public-health-management.txt
+"Which countries have the most human plague cases?",plague-epidemiology-outbreaks-and-guidance.txt
+"Can a pet cat pass plague to a person?",plague-epidemiology-outbreaks-and-guidance.txt
+"Which patients should a clinician suspect of post-polio syndrome?",poliomyelitis-and-post-polio-syndrome-migrant-health-guide.txt
+"When did the UK last have a case of polio caught within the country?",poliomyelitis-and-post-polio-syndrome-migrant-health-guide.txt
+"How many sick residents in a care home count as a respiratory outbreak that I need to report?",report-an-outbreak-of-acute-respiratory-infection-in-an-adult-social-care-settin.txt
+"Where was the SFTS virus first found and how does it spread?",severe-fever-with-thrombocytopaenia-syndrome-sfts-epidemiology-outbreaks-and-gui.txt
+"At what temperature does cold weather start to count as a health risk for vulnerable patients?",supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt
+"What are the colour levels of the cold-health alerts?",supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt
+"Can you catch tick-borne encephalitis from unpasteurised milk products?",tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt
+"How long before a trip should someone visiting relatives abroad ask for travel health advice?",travel-to-visit-friends-and-relatives-migrant-health-guide.txt
+"At what ages do children get the combined measles, mumps, rubella and chickenpox jab from 2026?",universal-varicella-vaccination-programme-in-england.txt
+"A woman had a live vaccine before she knew she was pregnant. Who should the GP tell?",vaccination-in-pregnancy-vip.txt
+"Why is south-east England considered a place where invasive Aedes mosquitoes could survive?",national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt
+"Has anyone caught West Nile virus in the UK, and has it been found in British mosquitoes?",national-contingency-plan-for-west-nile-virus-in-england.txt

@@ -13,3 +13,12 @@ def test_hit_rate_at_k():
 def test_length_mismatch_raises():
     with pytest.raises(ValueError):
         hit_rate_at_k([["a"]], ["a", "b"], k=1)
+
+
+def test_find_misses_lists_only_unretrieved():
+    from ragdemo.evaluate import find_misses
+
+    ranked = [["a", "b"], ["c", "d"]]
+    out = find_misses(["q1", "q2"], ranked, ["b", "a"], k=2)
+    assert out == [("q2", "a", ["c", "d"])]
+    assert find_misses(["q1"], [["a", "b"]], ["b"], k=1) == [("q1", "b", ["a"])]

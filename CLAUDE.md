@@ -25,10 +25,12 @@ pytest tests/test_chunking.py::test_chunks_overlap   # single test
 python -m ragdemo.ingest     # data/raw/*.txt -> data/chunks.jsonl
 python -m ragdemo.index      # data/chunks.jsonl -> data/index.faiss
 python -m ragdemo.evaluate   # prints Hit@1/3/5 using eval/eval_questions.csv
+python -m ragdemo.evaluate --misses   # also lists questions whose source was not in the top 5
+python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs questions through the LLM for manual marking
 streamlit run app.py
 ```
 
-The pipeline modules have no CLI argument parsing; settings (chunk `size=200`, `overlap=40`, model, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
+The pipeline modules have no CLI argument parsing (apart from the `--misses` flag on `evaluate` and `answer_check`, which uses argparse); settings (chunk `size=200`, `overlap=40`, model, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
 
 ## Architecture and invariants
 
@@ -37,7 +39,7 @@ The pipeline modules have no CLI argument parsing; settings (chunk `size=200`, `
 - **Index ↔ chunks alignment:** FAISS row `i` corresponds to line `i` of `chunks.jsonl`. Changing chunking requires re-running ingest *and* index. The embedding model used by `Retriever` must match the one used to build the index (both default to `index.DEFAULT_MODEL`, `all-MiniLM-L6-v2`).
 - **Similarity:** `IndexFlatIP` over `normalize_embeddings=True` vectors, i.e. cosine similarity.
 - **Evaluation:** `eval/eval_questions.csv` has columns `question,expected_source`; `expected_source` is a file name in `data/raw/` (the source id). Metric is `hit_rate_at_k` in `evaluate.py`. Results are meant to go in the README's evaluation table.
-- **LLM is pluggable and not connected yet:** `answer.answer(question, hits, generate)` takes any `generate(prompt) -> str` callable. `app.py` has a stub `generate` (TODO) that just echoes the grounded prompt.
+- **LLM is pluggable:** `answer.answer(question, hits, generate)` takes any `generate(prompt) -> str` callable. `ragdemo.llm.make_generate(backend)` returns one for `ollama` (default, `qwen2.5:7b`), `openrouter`, `hf` or `none`, chosen by the argument or `LLM_BACKEND`; `app.py` has a sidebar selector. If a backend's server or key is missing it falls back to echoing the grounded prompt. `llm.py` uses only the standard library at import time (`huggingface_hub` is imported lazily). API keys come from env vars (`OPENROUTER_API_KEY`, `HF_TOKEN`) and must never be committed.
 
 ## Data
 
