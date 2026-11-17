@@ -66,12 +66,12 @@ The app's sidebar has an "LLM backend" selector, so you can switch between Ollam
 If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM, and answer quality is not yet evaluated.
 
 ## Evaluation
-`eval/eval_questions.csv` holds 20 to 30 questions with the expected source file.
+`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw output: `results/retrieval_baseline.txt`. Only the baseline has been run so far.
 Compare a few setups and record the results here.
 
 | Setup | Chunk size (words) | Embedding model | Hit@1 | Hit@3 | Hit@5 |
 |-------|--------------------|-----------------|-------|-------|-------|
-| Baseline | 200 | all-MiniLM-L6-v2 | | | |
+| Baseline | 200 | all-MiniLM-L6-v2 | 0.90 | 0.98 | 0.98 |
 | Larger chunks | 400 | all-MiniLM-L6-v2 | | | |
 | Different model | 200 | (second model) | | | |
 
