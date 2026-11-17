@@ -12,6 +12,7 @@ import argparse
 import csv
 import os
 import random
+import time
 from datetime import date
 from pathlib import Path
 
@@ -89,6 +90,8 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--eval", default="eval/eval_questions.csv")
     parser.add_argument("--out-of-scope", default="eval/out_of_scope_questions.csv")
     parser.add_argument("--out", default="results/answer_check.md")
+    parser.add_argument("--delay", type=float, default=0.0,
+                        help="seconds to pause between questions (helps with rate limits)")
     args = parser.parse_args(argv)
 
     from .llm import make_generate
@@ -104,6 +107,8 @@ def main(argv: list[str] | None = None) -> None:
         print(f"[{number}/{len(items)}] {row['question']}")
         reply, hits = run_question(row["question"], retriever, generate)
         entries.append(format_entry(number, kind, row, reply, hits))
+        if args.delay and number < len(items):
+            time.sleep(args.delay)
 
     header = (
         f"# Answer check, run on {date.today().isoformat()}\n\n"

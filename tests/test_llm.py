@@ -80,3 +80,46 @@ def test_openrouter_empty_answer_raises(monkeypatch):
     )
     with pytest.raises(RuntimeError, match="empty"):
         make_openrouter_generate(api_key="k")("PROMPT")
+
+
+def _rate_limited(url="u"):
+    import urllib.error
+
+    return urllib.error.HTTPError(url, 429, "Too Many Requests", {}, None)
+
+
+def test_openrouter_retries_on_429(monkeypatch):
+    import io
+    import json
+
+    from ragdemo import llm
+
+    calls = {"n": 0}
+    sleeps = []
+
+    def fake_urlopen(req, timeout=None):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise _rate_limited()
+        return io.BytesIO(json.dumps({"choices": [{"message": {"content": "ok"}}]}).encode())
+
+    monkeypatch.setattr(llm.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(llm.time, "sleep", sleeps.append)
+    assert make_openrouter_generate(api_key="k", retry_wait=1)("PROMPT") == "ok"
+    assert calls["n"] == 3 and sleeps == [1, 2]
+
+
+def test_openrouter_gives_up_after_retries(monkeypatch):
+    from ragdemo import llm
+
+    calls = {"n": 0}
+
+    def always_429(req, timeout=None):
+        calls["n"] += 1
+        raise _rate_limited()
+
+    monkeypatch.setattr(llm.urllib.request, "urlopen", always_429)
+    monkeypatch.setattr(llm.time, "sleep", lambda s: None)
+    with pytest.raises(RuntimeError, match="429"):
+        make_openrouter_generate(api_key="k", retries=2)("PROMPT")
+    assert calls["n"] == 3
