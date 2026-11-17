@@ -1,16 +1,16 @@
 # Evaluation
 
-> Status: baseline run done; the larger-chunks and different-model setups are not yet run.
+> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. The larger-chunks and different-model setups have not been run.
 
 ## Goal
 
-_What is being measured and why (e.g. does retrieval find the right guidance page for a question?)._
+Two things are checked. Retrieval is measured: does it find the right guidance page for a question (Hit@k, below). Answer quality is only spot-checked by hand: are the LLM's answers grounded in the retrieved text, do they cite the right source, and does the model refuse when the sources lack the answer.
 
 ## Evaluation set
 
 - **File:** `eval/eval_questions.csv` (`question`, `expected_source`)
 - **Number of questions:** 51
-- **How questions were written:** _TODO (e.g. paraphrased, not copied from the page text)_
+- **How questions were written:** paraphrased from the page content, not copied from it, with one expected source per question (no topic that two pages both cover). They were written before the retriever was run, so the set was not tuned to the system, and mix plain-language and professional wording.
 - **Coverage:** all 32 pages in `data/raw/` have at least one question; no page has more than 2.
 
 ## Metric
@@ -28,9 +28,9 @@ Run with `python -m ragdemo.evaluate` (add `--misses` to list questions that fai
 
 ## Answer quality (optional)
 
-_Manual check of generated answers: are they grounded, are citations correct, does the model refuse when the sources lack the answer?_
+_Manual spot check of generated answers: are they grounded, are citations correct, does the model refuse when the sources lack the answer?_
 
-Run on 2026-11-17 with local Ollama (`qwen2.5:7b`), top 3 chunks per question, using `python -m ragdemo.answer_check` (report: `results/answer_check_ollama.md`). Six questions were sampled from the main set (seed 0) and six come from `eval/out_of_scope_questions.csv`. Verdicts were checked by hand against the source page text. A matching OpenRouter run (`results/answer_check_openrouter.md`) is incomplete: 4 of 12 answers failed with HTTP 429 (rate limited), and it was run with the earlier version of the out-of-scope set.
+This is a small qualitative check, not a benchmark. No scoring metric was computed, and counts are given with their sample size because 6 + 6 questions are too few for reliable percentages. Run on 2026-11-17 using `python -m ragdemo.answer_check`: top 3 chunks per question, six questions sampled from the main set (seed 0) and six from `eval/out_of_scope_questions.csv`. Verdicts were checked by hand against the source page text. Ollama (`qwen2.5:7b`) is in the table below (report: `results/answer_check_ollama.md`). The OpenRouter run (`results/answer_check_openrouter.md`) used the same 12 questions and is summarised after the table.
 
 | Question | Grounded? | Citations correct? | Notes |
 |----------|-----------|--------------------|-------|
@@ -49,6 +49,12 @@ Run on 2026-11-17 with local Ollama (`qwen2.5:7b`), top 3 chunks per question, u
 
 Summary: 4 of the 6 main-set answers were fully correct, 1 was partly correct and 1 was wrong. Of the 6 out-of-scope questions, 5 were refused cleanly and 1 was a partial blend. No answer invented facts outside the sources.
 
+**OpenRouter (`baidu/ernie-5.5-flash-preview:free`), same 12 questions:** 10 answers were correct or correctly refused, 1 was an honest non-answer and 1 failed.
+- Measles risk: said the sources do not identify the at-risk group, where Ollama answered confidently and wrongly. Given what retrieval supplied, this is the better behaviour.
+- Care-home outbreak: complete (5-day window, "linked by spread" caveat, single confirmed flu case), where Ollama left out the 5-day window.
+- COVID booster: failed with "empty answer". The measles-risk and SFTS answers were cut off mid-sentence. The 400-token cap may be the cause (not confirmed).
+- All five clear out-of-scope questions were refused cleanly.
+
 ## Failure analysis
 
 Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5. The question about the combined measles, mumps, rubella and chickenpox jab from 2026 expected `universal-varicella-vaccination-programme-in-england.txt`, but 4 of the top 5 chunks came from `mmr-catchup-programme-diagnosis-case-management-and-advice.txt` and one from `pertussis-clinical-and-public-health-management.txt`. The reason has not been investigated.
@@ -57,4 +63,8 @@ Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5
 
 ## Conclusions
 
-_Which setup worked best, and what you would try next._
+Retrieval found the right page within the top 5 for 50 of 51 questions (Hit@1 0.90, Hit@3 and Hit@5 0.98). The one miss was the MMRV chickenpox question, whose page was crowded out by the MMR catch-up page. Hit@k is measured at page level and hides a second kind of failure: for the measles-risk question the right page was retrieved but the chunk holding the answer was not, so one model answered wrongly and the other correctly said the sources did not say.
+
+In the manual spot check, both LLMs stayed within the sources and refused out-of-scope questions cleanly. Ollama (`qwen2.5:7b`) was concise and completed all 12 questions but answered the measles question confidently and wrongly. The OpenRouter free model was more careful but less reliable (one empty answer, two cut-off answers). With only 12 questions per model and one reviewer, these are observations, not measured accuracy.
+
+Larger chunks and a second embedding model were not run. Next steps: add a chunk-level retrieval check (is the answering chunk in the top k?), then test chunk size and overlap on all 51 questions instead of tuning on a single failure.

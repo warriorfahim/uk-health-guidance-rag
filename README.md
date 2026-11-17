@@ -63,10 +63,10 @@ Override with `OLLAMA_MODEL` or `OLLAMA_URL` (default `http://localhost:11434`).
 
 The app's sidebar has an "LLM backend" selector, so you can switch between Ollama and OpenRouter without restarting; `LLM_BACKEND` sets the initial choice.
 
-If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM, and answer quality is not yet evaluated.
+If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM. Answer quality was checked by hand on a small sample (see `docs/evaluation.md`).
 
 ## Evaluation
-`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw output: `results/retrieval_baseline.txt`. Only the baseline has been run so far.
+`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw output: `results/retrieval_baseline.txt`. Only the baseline has been run so far. Answers from two LLMs were also spot-checked by hand on 12 questions each; see `docs/evaluation.md`.
 Compare a few setups and record the results here.
 
 | Setup | Chunk size (words) | Embedding model | Hit@1 | Hit@3 | Hit@5 |
@@ -76,10 +76,13 @@ Compare a few setups and record the results here.
 | Different model | 200 | (second model) | | | |
 
 ## What I learned
-(Add 3 to 5 sentences: what worked, what failed, what you would change.)
+Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused out-of-scope questions instead of inventing facts. The main weakness is at chunk level: for one question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. I would add a chunk-level check and then test chunk size and overlap on all 51 questions, rather than tuning on a single failure. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off).
 
 ## Limitations
 - Answers are only as good as the retrieved passages. The model is told to say when the sources do not contain the answer.
+- Answer quality was judged by one person on 12 questions per model, with no scoring metric, so treat it as a spot check and not a benchmark.
+- Larger chunks and a second embedding model were not evaluated.
+- The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
 - This is a demo built on public data. It is not medical advice.
 
 ## Data
