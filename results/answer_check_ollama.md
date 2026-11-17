@@ -1,6 +1,6 @@
 # Answer check, run on 2026-11-17
 
-Top 3 chunks per question. Backend: see LLM_BACKEND (default ollama). Sample seed: 0. If an answer starts with 'No LLM available', the backend was not running and this is only the grounded prompt.
+Top 3 chunks per question. Backend: ollama (qwen2.5:7b). Sample seed: 0. Replies are capped at 400 tokens, so long answers may be cut off. If an answer starts with 'No LLM available', the backend was not running and this is only the grounded prompt.
 
 ### 1. Who is most at risk of catching measles at the moment?
 
@@ -70,7 +70,7 @@ The UK last had a case of polio caught within the country in 1984 [1].
 
 **Answer:**
 
-You need to report 2 or more acute respiratory infection (ARI) cases as an outbreak if they could be linked by spread within your setting [1].
+You need to report 2 or more cases of acute respiratory infection (ARI) as an outbreak if they could be linked by spread within your setting [1].
 
 - Correct? (yes/no/partly):
 - Grounded in the sources? (yes/no):
@@ -85,7 +85,7 @@ You need to report 2 or more acute respiratory infection (ARI) cases as an outbr
 
 **Answer:**
 
-Chronic skin wounds in people who have recently arrived in the UK are relevant to diphtheria because the bacteria Corynebacterium diphtheriae can colonize or infect such wounds, leading to cutaneous diphtheria [1]. This is particularly important given that many migrants have experienced long journeys prior to reaching the UK and often have poor skin integrity, increasing the risk of such infections [1].
+Chronic skin wounds in people who have recently arrived in the UK are relevant to diphtheria because the bacterium *Corynebacterium diphtheriae* can colonize or infect such long-standing wounds, which can lead to the cutaneous form of diphtheria [1].
 
 - Correct? (yes/no/partly):
 - Grounded in the sources? (yes/no):
@@ -95,12 +95,12 @@ Chronic skin wounds in people who have recently arrived in the UK are relevant t
 ### 7. What is the recommended adult dose of paracetamol?
 
 - Type: out-of-scope
-- Note: Not covered by any page; model should say sources don't contain the answer
+- Note: Not covered: paracetamol is mentioned once (Zika symptom relief) with no dose; model should say sources don't contain the answer
 - Retrieved: [1] `pertussis-clinical-and-public-health-management.txt`, [2] `pertussis-clinical-and-public-health-management.txt`, [3] `diphtheria-migrant-health-guide.txt`
 
 **Answer:**
 
-I cannot answer from the provided guidance. The sources do not contain information about the recommended adult dose of paracetamol.
+I cannot answer from the provided guidance. The given sources do not contain information about the recommended adult dose of paracetamol.
 
 - Said the sources do not contain the answer? (yes/no):
 - Added facts from outside the sources? (yes/no):
@@ -123,7 +123,7 @@ I cannot answer from the provided guidance. The given sources do not contain inf
 ### 9. Is the flu vaccine safe for people with egg allergy?
 
 - Type: out-of-scope
-- Note: Flu vaccine not covered
+- Note: Flu vaccine safety not covered
 - Retrieved: [1] `pertussis-clinical-and-public-health-management.txt`, [2] `diphtheria-migrant-health-guide.txt`, [3] `national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt`
 
 **Answer:**
@@ -134,15 +134,15 @@ I cannot answer from the provided guidance as the sources do not contain informa
 - Added facts from outside the sources? (yes/no):
 - Notes:
 
-### 10. What are the symptoms of dengue fever?
+### 10. What are the side effects of the HPV vaccine?
 
 - Type: out-of-scope
-- Note: Dengue only mentioned in passing
-- Retrieved: [1] `national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt`, [2] `national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt`, [3] `national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt`
+- Note: HPV not mentioned in any page
+- Retrieved: [1] `national-contingency-plan-for-west-nile-virus-in-england.txt`, [2] `mers-cov-background-information.txt`, [3] `crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt`
 
 **Answer:**
 
-Symptoms of dengue fever can include fever, headache, muscle aches, joint pains, nausea and vomiting, and rash. [1] [2]
+I cannot answer from the provided guidance. The sources given are related to West Nile virus, MERS-CoV, and Crimean-Congo hemorrhagic fever, but none of them contain information about the HPV vaccine or its side effects.
 
 - Said the sources do not contain the answer? (yes/no):
 - Added facts from outside the sources? (yes/no):
@@ -151,7 +151,7 @@ Symptoms of dengue fever can include fever, headache, muscle aches, joint pains,
 ### 11. Where can I get a COVID-19 booster this winter?
 
 - Type: out-of-scope
-- Note: Not covered
+- Note: Boundary case: pages only say the NHS contacts people who may be eligible; no locations given
 - Retrieved: [1] `supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt`, [2] `report-an-outbreak-of-acute-respiratory-infection-in-an-adult-social-care-settin.txt`, [3] `report-an-outbreak-of-acute-respiratory-infection-in-an-adult-social-care-settin.txt`
 
 **Answer:**
@@ -164,15 +164,15 @@ Please note that the specific locations or methods for getting a COVID-19 booste
 - Added facts from outside the sources? (yes/no):
 - Notes:
 
-### 12. Does Zika spread through sexual contact and for how long afterwards should couples use condoms?
+### 12. How long should someone with scabies stay off work?
 
 - Type: out-of-scope
-- Note: Partly covered; check whether the model overreaches
-- Retrieved: [1] `health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt`, [2] `health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt`, [3] `health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt`
+- Note: Scabies not mentioned in any page
+- Retrieved: [1] `mmr-catchup-programme-diagnosis-case-management-and-advice.txt`, [2] `lassa-fever-origins-reservoirs-transmission-and-guidelines.txt`, [3] `mmr-catchup-programme-diagnosis-case-management-and-advice.txt`
 
 **Answer:**
 
-Yes, Zika virus can be spread through sexual contact. According to the advice, couples should use consistent barrier methods (such as condoms) during and after travel to reduce the risk of conception and the developing fetus being exposed to Zika virus. For couples where both partners travelled, these measures should be used for 3 months after return or after the last possible Zika virus exposure [2]. If only the male partner travelled, the recommendation is also for 3 months after return or last possible exposure. For a female partner who travelled alone, the advice is to use these measures for 2 months after return or last possible exposure [2].
+I cannot answer from the provided guidance as the sources do not contain information about scabies or how long someone with scabies should stay off work.
 
 - Said the sources do not contain the answer? (yes/no):
 - Added facts from outside the sources? (yes/no):
