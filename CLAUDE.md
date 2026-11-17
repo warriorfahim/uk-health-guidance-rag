@@ -26,10 +26,11 @@ python -m ragdemo.ingest     # data/raw/*.txt -> data/chunks.jsonl
 python -m ragdemo.index      # data/chunks.jsonl -> data/index.faiss
 python -m ragdemo.evaluate   # prints Hit@1/3/5 using eval/eval_questions.csv
 python -m ragdemo.evaluate --misses   # also lists questions whose source was not in the top 5
+python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs questions through the LLM for manual marking
 streamlit run app.py
 ```
 
-The pipeline modules have no CLI argument parsing (apart from the single `--misses` flag on `evaluate`); settings (chunk `size=200`, `overlap=40`, model, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
+The pipeline modules have no CLI argument parsing (apart from the `--misses` flag on `evaluate` and `answer_check`, which uses argparse); settings (chunk `size=200`, `overlap=40`, model, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
 
 ## Architecture and invariants
 
