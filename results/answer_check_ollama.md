@@ -12,10 +12,10 @@ Top 3 chunks per question. Backend: ollama (qwen2.5:7b). Sample seed: 0. Replies
 
 Based on the provided sources, immunosuppressed individuals, pregnant women, and children under 1 year old are identified as vulnerable close contacts who require protection against measles [1]. Therefore, these groups are most at risk of catching measles at the moment.
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): no
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Answered a different question: named vulnerable contacts, not people aged 30 and under who missed 2 MMR doses. The answering sentence is in chunk 0, which was not retrieved (see docs/evaluation.md, failure analysis).
 
 ### 2. Which hantavirus is treated as an airborne high consequence infection in the UK because it can pass between people?
 
@@ -27,10 +27,10 @@ Based on the provided sources, immunosuppressed individuals, pregnant women, and
 
 Andes virus (ANDV) is treated as an airborne high consequence infection in the UK because it can pass between people [1].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct (Andes virus).
 
 ### 3. Where was the SFTS virus first found and how does it spread?
 
@@ -42,10 +42,10 @@ Andes virus (ANDV) is treated as an airborne high consequence infection in the U
 
 The SFTS virus was first isolated from human blood in 2009 in China [3]. It is primarily spread through the bite of infected ticks [1][2]. Human-to-human transmission can occur through close contact with an infected individual, their blood or other body fluids, or their immediate environment [1][2].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct (China, 2009; tick bites). Left out that human-to-human spread is rare.
 
 ### 4. When did the UK last have a case of polio caught within the country?
 
@@ -57,10 +57,10 @@ The SFTS virus was first isolated from human blood in 2009 in China [3]. It is p
 
 The UK last had a case of polio caught within the country in 1984 [1].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct (1984).
 
 ### 5. How many sick residents in a care home count as a respiratory outbreak that I need to report?
 
@@ -72,10 +72,10 @@ The UK last had a case of polio caught within the country in 1984 [1].
 
 You need to report 2 or more cases of acute respiratory infection (ARI) as an outbreak if they could be linked by spread within your setting [1].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): partly
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Gave '2 or more... if linked by spread' but left out the 5-day window for symptom onset.
 
 ### 6. Why are chronic skin wounds in people who have recently arrived in the UK relevant to diphtheria?
 
@@ -87,10 +87,10 @@ You need to report 2 or more cases of acute respiratory infection (ARI) as an ou
 
 Chronic skin wounds in people who have recently arrived in the UK are relevant to diphtheria because the bacterium *Corynebacterium diphtheriae* can colonize or infect such long-standing wounds, which can lead to the cutaneous form of diphtheria [1].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct.
 
 ### 7. What is the recommended adult dose of paracetamol?
 
@@ -102,9 +102,9 @@ Chronic skin wounds in people who have recently arrived in the UK are relevant t
 
 I cannot answer from the provided guidance. The given sources do not contain information about the recommended adult dose of paracetamol.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal.
 
 ### 8. How many people caught measles in England last year?
 
@@ -116,9 +116,9 @@ I cannot answer from the provided guidance. The given sources do not contain inf
 
 I cannot answer from the provided guidance. The given sources do not contain information about the number of people who caught measles in England last year. [2] provides guidance on managing cases and contacts but does not give incidence data.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal; noted the page covers case management but has no incidence data.
 
 ### 9. Is the flu vaccine safe for people with egg allergy?
 
@@ -130,9 +130,9 @@ I cannot answer from the provided guidance. The given sources do not contain inf
 
 I cannot answer from the provided guidance as the sources do not contain information related to the safety of the flu vaccine for people with egg allergy.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal.
 
 ### 10. What are the side effects of the HPV vaccine?
 
@@ -144,9 +144,9 @@ I cannot answer from the provided guidance as the sources do not contain informa
 
 I cannot answer from the provided guidance. The sources given are related to West Nile virus, MERS-CoV, and Crimean-Congo hemorrhagic fever, but none of them contain information about the HPV vaccine or its side effects.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal; named the unrelated pages it was given.
 
 ### 11. Where can I get a COVID-19 booster this winter?
 
@@ -160,9 +160,9 @@ According to the provided sources, you can check whether you are eligible for a 
 
 Please note that the specific locations or methods for getting a COVID-19 booster are not detailed in the provided sources, but the general guidance is to check with your employer, pharmacy, or GP for eligibility and booking an appointment.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): partly
+- Added facts from outside the sources? (yes/no): no
+- Notes: Boundary case. Applied the flu-vaccine route (employer, pharmacy, GP) to COVID; the page only says the NHS contacts people who may be eligible. Admitted locations are not given but did not clearly refuse.
 
 ### 12. How long should someone with scabies stay off work?
 
@@ -174,6 +174,6 @@ Please note that the specific locations or methods for getting a COVID-19 booste
 
 I cannot answer from the provided guidance as the sources do not contain information about scabies or how long someone with scabies should stay off work.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal.

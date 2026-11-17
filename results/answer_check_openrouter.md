@@ -18,10 +18,10 @@ The closest relevant content is about vulnerable groups needing protection after
 - Infants travelling on longer breaks to regions with local outbreaks who are likely to meet local families may receive MMR from as early as 6 months of age, though the response is sub-optimal and doses before 12 months are discounted [2].
 - Measles is described as highly infectious, with patients with rash illness needing to be kept separate from other
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): no
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Honest non-answer: said the sources do not identify the at-risk group, then listed what it saw. Better than a confident wrong answer. Cut off at the end. Chunk 0 (the answering sentence) was not retrieved.
 
 ### 2. Which hantavirus is treated as an airborne high consequence infection in the UK because it can pass between people?
 
@@ -33,10 +33,10 @@ The closest relevant content is about vulnerable groups needing protection after
 
 Andes virus (ANDV) is classified as an airborne high consequence infectious disease (HCID) in the UK because it has shown potential to spread from person-to-person [1].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct (Andes virus).
 
 ### 3. Where was the SFTS virus first found and how does it spread?
 
@@ -55,10 +55,10 @@ Transmission routes:
 - Human-to-human transmission is rare but documented [3], and requires close contact with an infected individual, their blood or other body fluids, or their immediate environment [1][2]. Nosocomial transmission has been reported in emergency departments and intensive care units in China and South Korea [1], and transmission via percutaneous exposure such as a needle-stick injury has also been reported [1].
 -
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct and more detailed than Ollama, including that human-to-human spread is rare. Details checked against the page. Cut off at the end.
 
 ### 4. When did the UK last have a case of polio caught within the country?
 
@@ -70,10 +70,10 @@ Transmission routes:
 
 The last case of domestically acquired polio infection in the UK was in 1984 [1][2]. All cases since then have been acquired abroad [2].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct (1984).
 
 ### 5. How many sick residents in a care home count as a respiratory outbreak that I need to report?
 
@@ -89,10 +89,10 @@ Two caveats:
 - You only need to report 2 or more cases as an outbreak if they could be linked by spread within your setting; if the infection could not have been spread there, it isn't an outbreak to report [3].
 - A single confirmed case of flu is reportable on its own, separately from the 2-case outbreak threshold [1].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Complete: 5-day window, linked-by-spread caveat and the single confirmed flu case rule. Better than Ollama.
 
 ### 6. Why are chronic skin wounds in people who have recently arrived in the UK relevant to diphtheria?
 
@@ -111,10 +111,10 @@ Two further points follow from this:
 
 The sources also point to dedicated guidance on this: "Skin lesions in newly arrived migrants: recognising and managing infections of public health importance" [2], and supplementary guidance on managing suspected cases, close contacts and their environment in asylum seeker accommodation settings [3].
 
-- Correct? (yes/no/partly):
-- Grounded in the sources? (yes/no):
-- Citations point to the right source? (yes/no):
-- Notes:
+- Correct? (yes/no/partly): yes
+- Grounded in the sources? (yes/no): yes
+- Citations point to the right source? (yes/no): yes
+- Notes: Correct; the extra points (notifiable, co-infection, linked guidance) are in the page.
 
 ### 7. What is the recommended adult dose of paracetamol?
 
@@ -126,9 +126,9 @@ The sources also point to dedicated guidance on this: "Skin lesions in newly arr
 
 I cannot answer this from the provided guidance. None of the sources mention paracetamol or its dosing. Source [1] and [2] cover pertussis (vaccination schedules and antibiotic treatment), and source [3] covers diphtheria treatment with diphtheria anti-toxin and antibiotics, but none address paracetamol.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal. 'None of the sources mention paracetamol' is true of the three retrieved sources.
 
 ### 8. How many people caught measles in England last year?
 
@@ -140,9 +140,9 @@ I cannot answer this from the provided guidance. None of the sources mention par
 
 I cannot answer this from the provided guidance. Source [2] covers measles case management and advice (isolation, exclusion periods, protecting vulnerable contacts with MMR or HNIG) but does not contain any statistics on the number of measles cases in England last year.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal.
 
 ### 9. Is the flu vaccine safe for people with egg allergy?
 
@@ -154,9 +154,9 @@ I cannot answer this from the provided guidance. Source [2] covers measles case 
 
 I cannot answer this question from the provided guidance. None of the sources discuss the flu vaccine or egg allergy. The sources cover pertussis (whooping cough) [1], diphtheria [2], and mosquito-borne diseases such as dengue, Zika, and chikungunya [3], but none contain information about influenza vaccination or its safety for people with egg allergy.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal.
 
 ### 10. What are the side effects of the HPV vaccine?
 
@@ -168,9 +168,9 @@ I cannot answer this question from the provided guidance. None of the sources di
 
 I cannot answer this question from the provided sources. The available sources cover the West Nile Virus [1], MERS-CoV [2], and Crimean-Congo Haemorrhagic Fever [3], but none of them contain information about the HPV vaccine or its side effects.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal; named the unrelated pages it was given.
 
 ### 11. Where can I get a COVID-19 booster this winter?
 
@@ -182,9 +182,9 @@ I cannot answer this question from the provided sources. The available sources c
 
 ERROR from LLM: OpenRouter returned an empty answer
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): n/a (call failed)
+- Added facts from outside the sources? (yes/no): n/a (call failed)
+- Notes: Failed: 'OpenRouter returned an empty answer' (not a rate-limit error). The 400-token cap may be the cause (not confirmed).
 
 ### 12. How long should someone with scabies stay off work?
 
@@ -198,6 +198,6 @@ I cannot answer this from the provided sources. None of them mention scabies or 
 
 The sources cover only measles and Lassa fever. For measles, the guidance is to advise people to stay away from school or nursery for 4 days after the onset of rash [1], and to exclude a suspected case from childcare settings, school, college, or workplace for 4 full days from the onset of rash [3] — but this applies to measles, not scabies.
 
-- Said the sources do not contain the answer? (yes/no):
-- Added facts from outside the sources? (yes/no):
-- Notes:
+- Said the sources do not contain the answer? (yes/no): yes
+- Added facts from outside the sources? (yes/no): no
+- Notes: Correct refusal. Then added measles exclusion rules; they are in the page and labelled as measles, so not misleading.
