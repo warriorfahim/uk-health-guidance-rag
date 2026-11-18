@@ -56,6 +56,7 @@ The pipeline modules have no CLI argument parsing (apart from the `--misses` fla
 
 ## Git workflow
 
+- Always ask me before committing, even when the work is finished and `ruff check .` and `pytest -q` pass. Do not run `git commit` on your own. If my message already tells you to commit (for example "commit this"), that counts as the answer and you do not need to ask again.
 - After you commit the work for a request (not after every intermediate commit in a series), ask me what to do next: merge into `main`, open a pull request, or leave it on the branch. Do not merge or push to `main` until I answer.
 - If I choose merge or a pull request, then ask whether to switch back to `main` (and pull the latest). Do not switch branches before I answer.
 - After anything is merged into `main`, pull the latest `main` (`git pull --ff-only`) so the local copy matches `origin/main`. This applies whether I asked you to merge it or I tell you I merged a pull request on GitHub.
