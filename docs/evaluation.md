@@ -23,12 +23,10 @@ Run with `python -m ragdemo.evaluate` (add `--misses` to list questions that fai
 | Setup | Chunk size (words) | Overlap | Embedding model | Hit@1 | Hit@3 | Hit@5 |
 |-------|--------------------|---------|-----------------|-------|-------|-------|
 | Baseline | 200 | 40 | all-MiniLM-L6-v2 | 0.90 | 0.98 | 0.98 |
-| Larger chunks | 400 | 80 | all-MiniLM-L6-v2 | | | |
-| Different model | 200 | 40 | _TODO_ | | | |
+| Larger chunks | 400 | 80 | all-MiniLM-L6-v2 | not yet run | not yet run | not yet run |
+| Different model | 200 | 40 | not yet chosen | not yet run | not yet run | not yet run |
 
-## Answer quality (optional)
-
-_Manual spot check of generated answers: are they grounded, are citations correct, does the model refuse when the sources lack the answer?_
+## Answer quality
 
 This is a small qualitative check, not a benchmark. No scoring metric was computed, and counts are given with their sample size because 6 + 6 questions are too few for reliable percentages. Run on 2026-11-17 using `python -m ragdemo.answer_check`: top 3 chunks per question, six questions sampled from the main set (seed 0) and six from `eval/out_of_scope_questions.csv`. Verdicts were checked by hand against the source page text. Ollama (`qwen2.5:7b`) is in the table below (report: `results/answer_check_ollama.md`). The OpenRouter run (`results/answer_check_openrouter.md`) used the same 12 questions and is summarised after the table.
 
@@ -65,6 +63,6 @@ Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5
 
 Retrieval found the right page within the top 5 for 50 of 51 questions (Hit@1 0.90, Hit@3 and Hit@5 0.98). The one miss was the MMRV chickenpox question, whose page was crowded out by the MMR catch-up page. Hit@k is measured at page level and hides a second kind of failure: for the measles-risk question the right page was retrieved but the chunk holding the answer was not, so one model answered wrongly and the other correctly said the sources did not say.
 
-In the manual spot check, both LLMs stayed within the sources and refused out-of-scope questions cleanly. Ollama (`qwen2.5:7b`) was concise and completed all 12 questions but answered the measles question confidently and wrongly. The OpenRouter free model was more careful but less reliable (one empty answer, two cut-off answers). With only 12 questions per model and one reviewer, these are observations, not measured accuracy.
+In the manual spot check, both LLMs stayed within the sources and refused most out-of-scope questions cleanly. The one exception was the COVID booster boundary question, where Ollama blended flu and COVID guidance (the OpenRouter call for that question failed). Ollama (`qwen2.5:7b`) was concise and completed all 12 questions but answered the measles question confidently and wrongly. The OpenRouter free model was more careful but less reliable (one empty answer, two cut-off answers). With only 12 questions per model and one reviewer, these are observations, not measured accuracy.
 
 Larger chunks and a second embedding model were not run. Next steps: add a chunk-level retrieval check (is the answering chunk in the top k?), then test chunk size and overlap on all 51 questions instead of tuning on a single failure.
