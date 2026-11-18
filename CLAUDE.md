@@ -58,5 +58,6 @@ The pipeline modules have no CLI argument parsing (apart from the `--misses` fla
 
 - After you commit the work for a request (not after every intermediate commit in a series), ask me what to do next: merge into `main`, open a pull request, or leave it on the branch. Do not merge or push to `main` until I answer.
 - If I choose merge or a pull request, then ask whether to switch back to `main` (and pull the latest). Do not switch branches before I answer.
+- After anything is merged into `main`, pull the latest `main` (`git pull --ff-only`) so the local copy matches `origin/main`. This applies whether I asked you to merge it or I tell you I merged a pull request on GitHub.
 - `gh` is not installed. For a pull request, give me the GitHub compare link (`https://github.com/warriorfahim/uk-health-guidance-rag/compare/main...<branch>?expand=1`) plus a title and description to paste.
 - Never delete branches, force-push or rewrite pushed history unless I ask.
