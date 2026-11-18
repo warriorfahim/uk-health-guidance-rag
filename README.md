@@ -3,7 +3,7 @@
 A small semantic search and retrieval-augmented question answering (RAG) demo over public UK health guidance.
 It retrieves the most relevant passages for a question, answers using only those passages, and shows the sources.
 
-> Status: work in progress. Fill in the evaluation table below once you have run the experiments.
+> Status: work in progress. The baseline retrieval run and a manual answer check are done. The larger-chunks and second-model rows of the evaluation table are not yet run.
 
 ## What it does
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
@@ -11,14 +11,17 @@ It retrieves the most relevant passages for a question, answers using only those
 3. Retrieves the top-k chunks for a query (semantic search).
 4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources. The Streamlit app sends it to a local Ollama model by default (`qwen2.5:7b`), or to OpenRouter or Hugging Face if you pick one of those (see "Connecting an LLM").
 5. Evaluates retrieval on a hand-written question set (hit rate at k).
+6. Runs a manual answer check: a sample of questions goes through retrieval and the LLM, and a report is written for you to mark by hand.
 
 ## Project layout
 ```
-src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, llm, evaluate
+src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, llm, evaluate, answer_check
 app.py         Streamlit interface
 tests/         unit tests (run in CI, no model downloads needed)
 data/raw/      cleaned .txt guidance pages (not committed; `fetch` can create these)
-eval/          eval_questions.csv: question, expected_source
+eval/          eval_questions.csv (question, expected_source) and out_of_scope_questions.csv (question, note)
+results/       saved output of real runs: retrieval baseline and answer-check reports
+docs/          architecture.md and evaluation.md
 .github/       CI workflow (tests and lint on every push)
 ```
 
@@ -36,6 +39,8 @@ python -m ragdemo.fetch fetch       # writes data/raw/<slug>.txt and data/raw/ma
 python -m ragdemo.ingest            # writes data/chunks.jsonl
 python -m ragdemo.index             # writes data/index.faiss
 python -m ragdemo.evaluate          # prints hit rate at k = 1, 3, 5
+python -m ragdemo.evaluate --misses # also lists questions whose source was not in the top 5
+python -m ragdemo.answer_check --out results/answer_check_ollama.md   # needs an LLM backend (see below)
 streamlit run app.py
 ```
 
@@ -57,11 +62,11 @@ streamlit run app.py
 ```
 Override with `OLLAMA_MODEL` or `OLLAMA_URL` (default `http://localhost:11434`). Answers on CPU can take a while.
 
-**Hugging Face Inference Providers (optional).** `$env:LLM_BACKEND = "hf"` plus `$env:HF_TOKEN = "hf_..."`; the model defaults to `meta-llama/Llama-3.1-8B-Instruct` (override with `HF_MODEL`). This is a paid per-use service (the free allowance is small and calls can fail with 402 Payment Required), and retrieved text is sent to Hugging Face's servers.
+**Hugging Face Inference Providers (optional).** `$env:LLM_BACKEND = "hf"` plus `$env:HF_TOKEN = "hf_..."`; the model defaults to `meta-llama/Llama-3.1-8B-Instruct` (override with `HF_MODEL`). This is a paid per-use service (the free allowance is small and calls can fail with 402 Payment Required), and retrieved text is sent to Hugging Face's servers. This backend was not part of the answer check.
 
 **OpenRouter (optional).** `$env:LLM_BACKEND = "openrouter"` plus `$env:OPENROUTER_API_KEY = "sk-or-..."`; the model defaults to `baidu/ernie-5.5-flash-preview:free` (override with `OPENROUTER_MODEL`; check the current ID on openrouter.ai/models, as free preview models change). Free models can be rate limited (HTTP 429), and retrieved text is sent to OpenRouter and its model provider.
 
-The app's sidebar has an "LLM backend" selector, so you can switch between Ollama and OpenRouter without restarting; `LLM_BACKEND` sets the initial choice.
+The app's sidebar has an "LLM backend" selector, so you can switch between Ollama, OpenRouter, Hugging Face or none (grounded prompt only) without restarting; `LLM_BACKEND` sets the initial choice.
 
 If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM. Answer quality was checked by hand on a small sample (see `docs/evaluation.md`).
 
@@ -76,7 +81,7 @@ Compare a few setups and record the results here.
 | Different model | 200 | (second model) | | | |
 
 ## What I learned
-Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused out-of-scope questions instead of inventing facts. The main weakness is at chunk level: for one question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. I would add a chunk-level check and then test chunk size and overlap on all 51 questions, rather than tuning on a single failure. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off).
+Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts, although the local model blended flu and COVID guidance on one boundary question. The main weakness is at chunk level: for one question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. I would add a chunk-level check and then test chunk size and overlap on all 51 questions, rather than tuning on a single failure. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off).
 
 ## Limitations
 - Answers are only as good as the retrieved passages. The model is told to say when the sources do not contain the answer.
