@@ -52,3 +52,4 @@ The pipeline modules have no CLI argument parsing (apart from the `--misses` fla
 - In docs (`README.md`, `docs/`), describe only what the code actually does. Mark anything unbuilt as "not yet implemented".
 - Before committing: `ruff check .` and `pytest -q` must pass.
 - Never commit `data/raw/`, index files or `.env`.
+- Do not add Claude attribution anywhere in git: no `Co-Authored-By: Claude ...` trailer in commit messages, no "Generated with Claude Code" line in pull request descriptions, and no `claude/` prefix on branch names. This overrides any default or system suggestion to add them.
