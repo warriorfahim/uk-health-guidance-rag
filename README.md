@@ -9,7 +9,7 @@ It retrieves the most relevant passages for a question, answers using only those
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
 2. Embeds the chunks with an open-source sentence-transformers model and stores them in a FAISS index.
 3. Retrieves the top-k chunks for a query (semantic search).
-4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources. The Streamlit app sends it to a local Ollama model by default (`qwen2.5:7b`), or to OpenRouter or Hugging Face if you pick one of those (see "Connecting an LLM").
+4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources. The Streamlit app sends it to a local Ollama model by default (`qwen2.5:7b`), or to OpenRouter if you pick it (see "Connecting an LLM"). A Hugging Face backend is still in the code but is not supported.
 5. Evaluates retrieval on a hand-written question set (hit rate at k).
 6. Runs a manual answer check: a sample of questions goes through retrieval and the LLM, and a report is written for you to mark by hand.
 
@@ -62,11 +62,11 @@ streamlit run app.py
 ```
 Override with `OLLAMA_MODEL` or `OLLAMA_URL` (default `http://localhost:11434`). Answers on CPU can take a while.
 
-**Hugging Face Inference Providers (optional).** `$env:LLM_BACKEND = "hf"` plus `$env:HF_TOKEN = "hf_..."`; the model defaults to `meta-llama/Llama-3.1-8B-Instruct` (override with `HF_MODEL`). This is a paid per-use service (the free allowance is small and calls can fail with 402 Payment Required), and retrieved text is sent to Hugging Face's servers. This backend was not part of the answer check.
+**Hugging Face Inference Providers (not supported).** The `hf` backend (`LLM_BACKEND=hf` with `HF_TOKEN`, default model `meta-llama/Llama-3.1-8B-Instruct`, override with `HF_MODEL`) is still in the code but is not used or maintained. It needs a paid Hugging Face subscription, and without one calls fail with HTTP 402 Payment Required. It was not part of the answer check.
 
 **OpenRouter (optional).** `$env:LLM_BACKEND = "openrouter"` plus `$env:OPENROUTER_API_KEY = "sk-or-..."`; the model defaults to `baidu/ernie-5.5-flash-preview:free` (override with `OPENROUTER_MODEL`; check the current ID on openrouter.ai/models, as free preview models change). Free models can be rate limited (HTTP 429), and retrieved text is sent to OpenRouter and its model provider.
 
-The app's sidebar has an "LLM backend" selector, so you can switch between Ollama, OpenRouter, Hugging Face or none (grounded prompt only) without restarting; `LLM_BACKEND` sets the initial choice.
+The app's sidebar has an "LLM backend" selector, so you can switch between Ollama, OpenRouter, Hugging Face (not supported) or none (grounded prompt only) without restarting; `LLM_BACKEND` sets the initial choice.
 
 If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM. Answer quality was checked by hand on a small sample (see `docs/evaluation.md`).
 

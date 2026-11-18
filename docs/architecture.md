@@ -45,7 +45,7 @@ answer with citations  →  app.py (Streamlit UI)
 ## Models
 
 - **Embedding model:** _final choice and why_
-- **LLM:** The default LLM backend is local Ollama (qwen2.5:7b), chosen so that questions and retrieved text never leave the machine and there are no API costs or rate limits. Hugging Face and OpenRouter are optional backends, selected in the sidebar. OpenRouter is used with a free open-source model, which may be rate-limited. The Hugging Face backend is implemented but untested, and is kept for use with a paid subscription in future. Both send the question and retrieved text to a third party, with no guarantee the models are hosted in the UK.
+- **LLM:** The default LLM backend is local Ollama (qwen2.5:7b), chosen so that questions and retrieved text never leave the machine and there are no API costs or rate limits. OpenRouter is an optional backend, selected in the sidebar. It is used with a free open-source model, which may be rate-limited. It sends the question and retrieved text to a third party, with no guarantee the models are hosted in the UK. A Hugging Face backend is still in the code but is not supported: it requires a paid subscription, and calls without one fail with HTTP 402.
 
 ## Design decisions and trade-offs
 
