@@ -30,11 +30,11 @@ python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs 
 streamlit run app.py
 ```
 
-The pipeline modules have no CLI argument parsing (apart from the `--misses` flag on `evaluate` and `answer_check`, which uses argparse); settings (chunk `size=200`, `overlap=40`, model, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
+Only a few modules take command-line arguments: `evaluate` accepts a single `--misses` flag (read from `sys.argv`), `answer_check` uses argparse (`--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--delay`), and `fetch` uses argparse subcommands. `ingest`, `index` and `retrieve` take none. Settings (chunk `size=200`, `overlap=40`, model, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
 
 ## Architecture and invariants
 
-- **Heavy imports stay inside functions.** `faiss` and `sentence_transformers` are imported lazily in `index.embed`, `index.main`, and `Retriever.__init__`. CI (`.github/workflows/ci.yml`) installs only `pytest` and `ruff` plus `pip install -e . --no-deps`, so any top-level import of those libraries in a tested module (`chunking`, `ingest`, `evaluate`) will break CI. Tests must not download models or need the index.
+- **Heavy imports stay inside functions.** `faiss` and `sentence_transformers` are imported lazily in `index.embed`, `index.main`, and `Retriever.__init__`. CI (`.github/workflows/ci.yml`) installs only `pytest` and `ruff` plus `pip install -e . --no-deps`, so any top-level import of those libraries in a module imported by a test (currently `chunking`, `ingest`, `evaluate`) will break CI. Tests must not download models or need the index.
 - **Chunk record schema** (`data/chunks.jsonl`): `{"source": <file name>, "chunk_id": int, "text": str}`. `Retriever.search` returns copies of these dicts plus `"score"`; `answer.build_prompt` and `app.py` rely on `source`/`text`/`score`.
 - **Index ↔ chunks alignment:** FAISS row `i` corresponds to line `i` of `chunks.jsonl`. Changing chunking requires re-running ingest *and* index. The embedding model used by `Retriever` must match the one used to build the index (both default to `index.DEFAULT_MODEL`, `all-MiniLM-L6-v2`).
 - **Similarity:** `IndexFlatIP` over `normalize_embeddings=True` vectors, i.e. cosine similarity.
@@ -56,9 +56,10 @@ The pipeline modules have no CLI argument parsing (apart from the `--misses` fla
 
 ## Git workflow
 
-- Always ask me before committing, even when the work is finished and `ruff check .` and `pytest -q` pass. Do not run `git commit` on your own. If my message already tells you to commit (for example "commit this"), that counts as the answer and you do not need to ask again.
-- After you commit the work for a request (not after every intermediate commit in a series), ask me what to do next: merge into `main`, open a pull request, or leave it on the branch. Do not merge or push to `main` until I answer.
-- If I choose merge or a pull request, then ask whether to switch back to `main` (and pull the latest). Do not switch branches before I answer.
-- After anything is merged into `main`, pull the latest `main` (`git pull --ff-only`) so the local copy matches `origin/main`. This applies whether I asked you to merge it or I tell you I merged a pull request on GitHub.
+- After you commit the work for a request (not after every intermediate commit in a series), ask me what to do next: merge into `main`, open a pull request, or leave it on the branch. Do not merge into `main` or push `main` until I answer.
+- Pushing the feature branch itself (needed for a pull request compare link) is fine once I choose a pull request; do not push it before then unless I ask.
+- After anything is merged into `main`, switch to `main` and pull the latest (`git pull --ff-only`) so the local copy matches `origin/main`. This applies whether I asked you to merge it or I tell you I merged a pull request on GitHub. If I chose a pull request, stay on the branch until I say it is merged.
+- Branch names: `feature/<short-name>`, `fix/<short-name>` or `docs/<short-name>`, lowercase with hyphens.
+- Commit messages: short imperative subject (about 50 characters), with a body only when the reason isn't obvious from the diff.
 - `gh` is not installed. For a pull request, give me the GitHub compare link (`https://github.com/warriorfahim/uk-health-guidance-rag/compare/main...<branch>?expand=1`) plus a title and description to paste.
 - Never delete branches, force-push or rewrite pushed history unless I ask.
