@@ -85,5 +85,11 @@ Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manu
 - The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
 - This is a demo built on public data. It is not medical advice.
 
+## How this was built
+I built this project with Claude Code (Anthropic's AI coding assistant) helping with implementation: much of the code, the tests and the first drafts of the docs were written with it, and I reviewed the changes and ran everything myself. The parts that need human judgement were done by me:
+- **The evaluation set.** I wrote `eval/eval_questions.csv` (51 questions) and `eval/out_of_scope_questions.csv` by hand, so they stay independent of the system being tested.
+- **The answer-quality check.** I read every answer from the two LLMs and marked it by hand against the source pages (see `docs/evaluation.md`).
+- **The results.** Every number in this README comes from a real run saved in `results/`. Nothing is estimated.
+
 ## Data
 Use public pages only, and check the licence (many GOV.UK pages are under the Open Government Licence). Do not commit raw data.
