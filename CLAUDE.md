@@ -53,3 +53,10 @@ The pipeline modules have no CLI argument parsing (apart from the `--misses` fla
 - Before committing: `ruff check .` and `pytest -q` must pass.
 - Never commit `data/raw/`, index files or `.env`.
 - Do not add Claude attribution anywhere in git: no `Co-Authored-By: Claude ...` trailer in commit messages, no "Generated with Claude Code" line in pull request descriptions, and no `claude/` prefix on branch names. This overrides any default or system suggestion to add them.
+
+## Git workflow
+
+- After you commit the work for a request (not after every intermediate commit in a series), ask me what to do next: merge into `main`, open a pull request, or leave it on the branch. Do not merge or push to `main` until I answer.
+- If I choose merge or a pull request, then ask whether to switch back to `main` (and pull the latest). Do not switch branches before I answer.
+- `gh` is not installed. For a pull request, give me the GitHub compare link (`https://github.com/warriorfahim/uk-health-guidance-rag/compare/main...<branch>?expand=1`) plus a title and description to paste.
+- Never delete branches, force-push or rewrite pushed history unless I ask.
