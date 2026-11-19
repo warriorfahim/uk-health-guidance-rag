@@ -3,7 +3,7 @@
 A small semantic search and retrieval-augmented question answering (RAG) demo over public UK health guidance.
 It retrieves the most relevant passages for a question, answers using only those passages, and shows the sources.
 
-> Status: work in progress. The baseline retrieval run and a manual answer check are done. The 400-word chunk and second-model rows of the evaluation table are not yet run.
+> Status: work in progress. The baseline retrieval run and a manual answer check are done. The second-model row of the evaluation table is not yet run.
 
 ## What it does
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
@@ -71,7 +71,7 @@ The app's sidebar has an "LLM backend" selector, so you can switch between Ollam
 If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM. Answer quality was checked by hand on a small sample (see `docs/evaluation.md`).
 
 ## Evaluation
-`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt` and `results/retrieval_chunk150.txt`. The 400-word and second-model setups have not been run yet. Answers from two LLMs were also spot-checked by hand on 12 questions each; see `docs/evaluation.md`.
+`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt` and `results/retrieval_chunk400.txt`. The second-model setup has not been run yet. Answers from two LLMs were also spot-checked by hand on 12 questions each; see `docs/evaluation.md`.
 Compare a few setups and record the results here.
 
 | Setup | Chunk size (words) | Embedding model | Hit@1 | Hit@3 | Hit@5 |
@@ -79,18 +79,18 @@ Compare a few setups and record the results here.
 | Baseline | 200 | all-MiniLM-L6-v2 | 0.90 | 0.98 | 0.98 |
 | Smaller chunks | 100 | all-MiniLM-L6-v2 | 0.92 | 0.98 | 1.00 |
 | Smaller chunks | 150 | all-MiniLM-L6-v2 | 0.94 | 0.98 | 1.00 |
-| Larger chunks | 400 | all-MiniLM-L6-v2 | not yet run | not yet run | not yet run |
+| Larger chunks | 400 | all-MiniLM-L6-v2 | 0.94 | 0.98 | 1.00 |
 | Different model | 200 | (second model) | not yet run | not yet run | not yet run |
 
-Overlap was 20% of the chunk size in every run (40, 20 and 30 words). With 51 questions, one question is about 0.02, so the 100- and 150-word gains are one or two questions and could be noise. The baseline's 200-word chunks are often longer than the embedding model's 256-token input limit (55% of them); the 100- and 150-word chunks almost all fit. See `docs/evaluation.md`.
+Overlap was 20% of the chunk size in every run (40, 20, 30 and 80 words). With 51 questions, one question is about 0.02, so the gains over the baseline are one or two questions and could be noise. The baseline's 200-word chunks are often longer than the embedding model's 256-token input limit (55% of them); the 100- and 150-word chunks almost all fit. The 400-word chunks are mostly cut off by that limit (93% are over it) yet scored as well as the best smaller setup, so page-level Hit@k does not show the cost of truncation, and it is not comparable across chunk sizes because the top 5 cover more text when chunks are larger. See `docs/evaluation.md`.
 
 ## What I learned
-Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts, although the local model blended flu and COVID guidance on one boundary question. The main weakness is at chunk level: for one question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. I would add a chunk-level check and then test chunk size and overlap on all 51 questions, rather than tuning on a single failure. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off).
+Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts, although the local model blended flu and COVID guidance on one boundary question. The main weakness is at chunk level: for one question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. Chunk sizes of 100, 150 and 400 words all scored about the same as the 200-word baseline (within one or two questions), even though 93% of the 400-word chunks exceed the embedding model's 256-token limit, so page-level Hit@k could not separate them. I would add a chunk-level check (is the answering chunk in the top k?) before choosing a chunk size, rather than tuning on a single failure. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off).
 
 ## Limitations
 - Answers are only as good as the retrieved passages. The model is told to say when the sources do not contain the answer.
 - Answer quality was judged by one person on 12 questions per model, with no scoring metric, so treat it as a spot check and not a benchmark.
-- 400-word chunks and a second embedding model were not evaluated.
+- A second embedding model was not evaluated, and Hit@k is page-level, so it cannot tell whether the chunk holding the answer is retrieved.
 - The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
 - This is a demo built on public data. It is not medical advice.
 
