@@ -1,0 +1,10 @@
+# Retrieval, 100-word chunks, run on 2026-11-19
+# command: python -m ragdemo.evaluate --misses (after ingest size=100 overlap=20, then ragdemo.index)
+# chunk size=100 words, overlap=20, model=all-MiniLM-L6-v2, 651 chunks, 32 pages, 51 questions
+# tokens per chunk: median 130, max 224; over the 256-token limit: 0 of 651 (0%)
+
+Hit@1: 0.92
+Hit@3: 0.98
+Hit@5: 1.00
+
+Missed at k=5: 0 of 51
