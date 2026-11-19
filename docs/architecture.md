@@ -56,7 +56,7 @@ answer with citations  →  app.py (Streamlit UI)
   - It is small and fast, which suits 330 chunks and a laptop.
   - It is the standard example model in the sentence-transformers documentation, so it is a sensible, well-known baseline.
   - It scored Hit@5 0.98 on the 51-question set (`results/retrieval_baseline.txt`).
-  - Caveat: it reads at most 256 tokens per input and ignores the rest. 183 of the 330 baseline chunks (55%) are longer than that (median 259 tokens, maximum 409; `results/embedding_token_check.txt`), so for those chunks the last part of the text is not reflected in the embedding. Shorter chunks (the 100-word scenario) would fit; 400-word chunks would be cut off much more. This has not been tested.
+  - Caveat: it reads at most 256 tokens per input and ignores the rest. 183 of the 330 baseline chunks (55%) are longer than that (median 259 tokens, maximum 409; `results/embedding_token_check.txt`), so for those chunks the last part of the text is not reflected in the embedding. With 100-word chunks none are over the limit (0 of 651) and with 150-word chunks 11 of 436 (3%); 400-word chunks would be cut off much more, which has not been tested.
 - **LLM:** The default LLM backend is local Ollama (qwen2.5:7b), chosen so that questions and retrieved text never leave the machine and there are no API costs or rate limits. OpenRouter is an optional backend, selected in the sidebar. It is used with a free open-source model, which may be rate-limited. It sends the question and retrieved text to a third party, with no guarantee the models are hosted in the UK. A Hugging Face backend is still in the code but is not supported: it requires a paid subscription, and calls without one fail with HTTP 402.
 
 ## Design decisions and trade-offs
@@ -72,7 +72,7 @@ What the code does, with the reasons still to add:
 ## Limitations and future work
 
 - Answers are only as good as the retrieved passages. Hit@k is measured at page level, so it cannot see a case where the right page is retrieved but not the chunk holding the answer (the measles-risk question in `docs/evaluation.md`).
-- Retrieval baseline: Hit@1 0.90, Hit@3 0.98, Hit@5 0.98 on 51 questions (`results/retrieval_baseline.txt`). Larger chunks (400 words) and a second embedding model are not yet run.
+- Retrieval baseline: Hit@1 0.90, Hit@3 0.98, Hit@5 0.98 on 51 questions (`results/retrieval_baseline.txt`). Smaller chunks scored the same or slightly higher (100 words: 0.92, 0.98, 1.00; 150 words: 0.94, 0.98, 1.00; see `docs/evaluation.md`). 400-word chunks and a second embedding model are not yet run.
 - 55% of the baseline chunks exceed the embedding model's 256-token limit, so their later text does not influence retrieval. This may relate to the measles-risk miss, but that is not tested. Options to try: shorter chunks, or a model with a longer input limit.
 - Answer quality was judged by one person on 12 questions per model, so it is a spot check, not a benchmark.
 - Grounding relies on the prompt alone; there is no automatic check that an answer is supported by the sources or that its citations are correct.

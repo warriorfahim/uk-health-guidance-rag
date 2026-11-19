@@ -1,6 +1,6 @@
 # Evaluation
 
-> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. The larger-chunks and different-model setups have not been run.
+> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. Smaller chunks (100 and 150 words) have been run; the 400-word and different-model setups have not.
 
 ## Goal
 
@@ -23,8 +23,14 @@ Run with `python -m ragdemo.evaluate` (add `--misses` to list questions that fai
 | Setup | Chunk size (words) | Overlap | Embedding model | Hit@1 | Hit@3 | Hit@5 |
 |-------|--------------------|---------|-----------------|-------|-------|-------|
 | Baseline | 200 | 40 | all-MiniLM-L6-v2 | 0.90 | 0.98 | 0.98 |
+| Smaller chunks | 100 | 20 | all-MiniLM-L6-v2 | 0.92 | 0.98 | 1.00 |
+| Smaller chunks | 150 | 30 | all-MiniLM-L6-v2 | 0.94 | 0.98 | 1.00 |
 | Larger chunks | 400 | 80 | all-MiniLM-L6-v2 | not yet run | not yet run | not yet run |
 | Different model | 200 | 40 | not yet chosen | not yet run | not yet run | not yet run |
+
+Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt` and `results/retrieval_chunk150.txt` (each header records the settings, chunk count and token lengths). Overlap was 20% of the chunk size in every run. The 100- and 150-word runs missed 0 of 51 questions at k=5, against 1 of 51 for the baseline. One question is about 0.02 of a score, so Hit@1 moving from 0.90 (46 questions) to 0.92 (47) and 0.94 (48) is a one- or two-question change and could be noise.
+
+Token lengths under the embedding model's tokenizer, which reads at most 256 tokens per input: 183 of 330 baseline chunks (55%) are over the limit, against 11 of 436 (3%) for 150 words and 0 of 651 for 100 words. The smaller chunks therefore avoid most truncation, but chunk size changed in other ways too (more, shorter chunks), so this does not prove truncation was the cause. Hit@k is page-level, so these runs say nothing yet about whether the chunk holding the answer is retrieved (the measles-risk question).
 
 ## Answer quality
 
@@ -65,4 +71,4 @@ Retrieval found the right page within the top 5 for 50 of 51 questions (Hit@1 0.
 
 In the manual spot check, both LLMs stayed within the sources and refused most out-of-scope questions cleanly. The one exception was the COVID booster boundary question, where Ollama blended flu and COVID guidance (the OpenRouter call for that question failed). Ollama (`qwen2.5:7b`) was concise and completed all 12 questions but answered the measles question confidently and wrongly. The OpenRouter free model was more careful but less reliable (one empty answer, two cut-off answers). With only 12 questions per model and one reviewer, these are observations, not measured accuracy.
 
-Larger chunks and a second embedding model were not run. Next steps: add a chunk-level retrieval check (is the answering chunk in the top k?), then test chunk size and overlap on all 51 questions instead of tuning on a single failure.
+Smaller chunks (100 and 150 words) matched or slightly beat the baseline at every k, and found the baseline's one miss, but the gains are one or two questions out of 51. The 400-word chunks and a second embedding model were not run. Next steps: add a chunk-level retrieval check (is the answering chunk in the top k?), then test chunk size and overlap on all 51 questions instead of tuning on a single failure.
