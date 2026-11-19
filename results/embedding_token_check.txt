@@ -1,0 +1,5 @@
+# Token length of the baseline chunks under the embedding model's tokenizer
+# model: sentence-transformers/all-MiniLM-L6-v2; chunks: data/chunks.jsonl (200 words, overlap 40)
+# run on 2026-11-19; method: tokenizer(text, add_special_tokens=True) per chunk, compared with max_seq_length
+max_seq_length: 256 | embedding dim: 384 | params (M): 22.7
+chunks: 330 | tokens median: 259 | max: 409 | over limit: 183 (55%)
