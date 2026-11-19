@@ -1,0 +1,20 @@
+# Chunk-level retrieval check, 100-word chunks, run on 2026-11-19
+# command: python -m ragdemo.chunk_check (after ingest size=100 overlap=20, then ragdemo.index)
+# chunk size=100 words, overlap=20, model=all-MiniLM-L6-v2, 651 chunks, 32 pages, 21 of 51 questions have a hand-written answer_text
+
+21 of 51 questions have an answer_text in eval/answer_spans.csv
+Checked 21 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.43
+Chunk-Hit@3: 0.71
+Chunk-Hit@5: 0.86
+
+Answering chunk not in the top 5: 3 of 21
+- Who is most at risk of catching measles at the moment?
+    answering chunk(s): mmr-catchup-programme-diagnosis-case-management-and-advice.txt#1
+    got: mmr-catchup-programme-diagnosis-case-management-and-advice.txt#5, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#15, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#10, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#14, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#0
+- At what temperature does cold weather start to count as a health risk for vulnerable patients?
+    answering chunk(s): supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#1
+    got: supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#7, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#6, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#27, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#13, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#3
+- Can you catch tick-borne encephalitis from unpasteurised milk products?
+    answering chunk(s): tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#8
+    got: tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#12, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#0, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#17, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#11, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#16
