@@ -26,6 +26,7 @@ python -m ragdemo.ingest     # data/raw/*.txt -> data/chunks.jsonl
 python -m ragdemo.index      # data/chunks.jsonl -> data/index.faiss
 python -m ragdemo.evaluate   # prints Hit@1/3/5 using eval/eval_questions.csv
 python -m ragdemo.evaluate --misses   # also lists questions whose source was not in the top 5
+python -m ragdemo.chunk_check   # chunk-level hit rate: is the chunk holding the answer in the top k? uses eval/answer_spans.csv
 python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs questions through the LLM for manual marking
 streamlit run app.py
 ```
@@ -48,7 +49,7 @@ Only a few modules take command-line arguments: `evaluate` accepts a single `--m
 ## Rules
 
 - Never invent evaluation numbers, results or findings. Only use output from real runs saved in `results/`.
-- Do not write or edit `eval/eval_questions.csv`; the eval set is written by hand so it stays independent of the system.
+- Do not write or edit `eval/eval_questions.csv`; the eval set is written by hand so it stays independent of the system. The same goes for the `answer_text` column of `eval/answer_spans.csv` (a short verbatim phrase from the answering sentence, written by hand).
 - In docs (`README.md`, `docs/`), describe only what the code actually does. Mark anything unbuilt as "not yet implemented".
 - Before committing: `ruff check .` and `pytest -q` must pass.
 - Never commit `data/raw/`, index files or `.env`.
