@@ -39,6 +39,7 @@ answer with citations  →  app.py (Streamlit UI)
 | `answer.py` | Build the grounded prompt | Numbered sources `[1] (file) text`, and rules to use only the sources, cite them, and say when they do not contain the answer. |
 | `llm.py` | LLM backends as `generate(prompt) -> str` | `ollama` (default), `openrouter`, `hf` (not supported) and `none`; falls back to echoing the prompt when a backend is unusable. |
 | `evaluate.py` | Hit@k on the retrieval eval set | Page-level metric. `--misses` lists failed questions. |
+| `chunk_check.py` | Chunk-level hit rate | A chunk counts as answering if it contains the hand-written phrase in `eval/answer_spans.csv`; questions with no phrase are skipped. |
 | `answer_check.py` | Manual answer-quality report | Runs sampled in-scope and out-of-scope questions through retrieval (top 3) and the LLM, and writes a report to mark by hand. |
 | `app.py` | Streamlit interface | Retrieves the top 3 chunks, shows the answer and the sources, and has a sidebar backend selector. |
 
@@ -76,4 +77,5 @@ What the code does, with the reasons still to add:
 - 55% of the baseline chunks exceed the embedding model's 256-token limit, so their later text does not influence retrieval. This may relate to the measles-risk miss, but that is not tested. Options to try: shorter chunks, or a model with a longer input limit.
 - Answer quality was judged by one person on 12 questions per model, so it is a spot check, not a benchmark.
 - Grounding relies on the prompt alone; there is no automatic check that an answer is supported by the sources or that its citations are correct.
-- Future work: a chunk-level retrieval check (is the answering chunk in the top k?), then testing chunk size and overlap on all 51 questions.
+- A chunk-level check (`chunk_check.py`, `eval/answer_spans.csv`) exists, but only 21 of 51 questions have a hand-written answer phrase. On those, Chunk-Hit@5 was 0.86 (100 and 150 words), 0.90 (200) and 0.95 (400); see `docs/evaluation.md`.
+- Future work: mark the remaining questions, then test overlap and a second embedding model with the chunk-level check.

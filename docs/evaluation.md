@@ -1,6 +1,6 @@
 # Evaluation
 
-> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. Chunk sizes of 100, 150 and 400 words have been run; the different-model setup has not.
+> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. Chunk sizes of 100, 150 and 400 words have been run at page level and at chunk level (21 questions); the different-model setup has not.
 
 ## Goal
 
@@ -33,6 +33,28 @@ Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, 
 Token lengths under the embedding model's tokenizer, which reads at most 256 tokens per input: 183 of 330 baseline chunks (55%) are over the limit, against 11 of 436 (3%) for 150 words and 0 of 651 for 100 words. The smaller chunks therefore avoid most truncation, but chunk size changed in other ways too (more, shorter chunks), so this does not prove truncation was the cause. Hit@k is page-level, so these runs say nothing yet about whether the chunk holding the answer is retrieved (the measles-risk question).
 
 The 400-word run is the opposite test: 158 of 169 chunks (93%) are over the 256-token limit (median 515 tokens, maximum 752), yet it scored 0.94, 0.98 and 1.00, as well as the best smaller setup. I expected a drop and did not get one, so page-level Hit@k does not show the cost of truncation. Hit@k is also not comparable across chunk sizes: the top 5 chunks cover about 2,000 words at 400 words per chunk, against about 500 at 100 words per chunk, which makes a page-level hit easier by itself.
+
+## Chunk-level check
+
+**Metric:** Chunk-Hit@k, the share of questions where a chunk containing the answer is in the top k. Run with `python -m ragdemo.chunk_check`. For each question I copied a short phrase word for word from the answering sentence into `answer_text` in `eval/answer_spans.csv`; a chunk counts as answering if its text contains the phrase (case, quotes and line breaks ignored), so the same file works for any chunk size. 21 of the 51 questions are marked so far; the tool skips the rest. In every run all 21 phrases were found in at least one chunk.
+
+| Setup | Chunk size (words) | Overlap | Chunks | Chunk-Hit@1 | Chunk-Hit@3 | Chunk-Hit@5 | Missed at k=5 |
+|-------|--------------------|---------|--------|-------------|-------------|-------------|---------------|
+| Smaller chunks | 100 | 20 | 651 | 0.43 | 0.71 | 0.86 | 3 |
+| Smaller chunks | 150 | 30 | 436 | 0.57 | 0.71 | 0.86 | 3 |
+| Baseline | 200 | 40 | 330 | 0.62 | 0.81 | 0.90 | 2 |
+| Larger chunks | 400 | 80 | 169 | 0.71 | 0.86 | 0.95 | 1 |
+| Different model | 200 | 40 | 330 | not yet run | not yet run | not yet run | not yet run |
+
+Raw output: `results/chunk_check_baseline.txt`, `results/chunk_check_chunk100.txt`, `results/chunk_check_chunk150.txt`, `results/chunk_check_chunk400.txt`.
+
+What the runs show:
+- One question is about 0.05, so the gap between 100 and 150 words at Hit@1 (0.43 against 0.57) is 3 questions. The pattern is more informative than any single number.
+- Larger chunks scored higher at every k, the opposite of the small-chunk lead at page level. The 400-word chunks were mostly over the embedding model's 256-token limit and still scored best, so truncation did not stop retrieval here. Why is not tested.
+- The measles-risk question (answering chunk is chunk 0 of the MMR catch-up page) was missed at every chunk size, and was the only miss at 400 words. This is the failure page-level Hit@k could not see.
+- The MMRV chickenpox question (a Hit@k miss in the baseline) was also a chunk-level miss in the baseline, but not at 100, 150 or 400 words. The other misses were: at 100 words, the cold-weather temperature and tick-borne encephalitis milk questions; at 150 words, the MERS countries and cold-weather temperature questions.
+- This is still not a fully fair comparison between sizes: a longer chunk is a bigger target for the phrase, and the top 5 cover more text. The check also does not test what the LLM does with longer chunks.
+- The 21 questions are the ones I chose to mark, not a random sample.
 
 ## Answer quality
 
@@ -73,4 +95,4 @@ Retrieval found the right page within the top 5 for 50 of 51 questions (Hit@1 0.
 
 In the manual spot check, both LLMs stayed within the sources and refused most out-of-scope questions cleanly. The one exception was the COVID booster boundary question, where Ollama blended flu and COVID guidance (the OpenRouter call for that question failed). Ollama (`qwen2.5:7b`) was concise and completed all 12 questions but answered the measles question confidently and wrongly. The OpenRouter free model was more careful but less reliable (one empty answer, two cut-off answers). With only 12 questions per model and one reviewer, these are observations, not measured accuracy.
 
-Chunk sizes of 100, 150 and 400 words all matched or slightly beat the baseline at every k and found the baseline's one miss, but the gains are one or two questions out of 51, and the heavily truncated 400-word chunks scored as well as the best smaller setup. Page-level Hit@k therefore does not separate these setups. A second embedding model was not run. Next steps: add a chunk-level retrieval check (is the answering chunk in the top k?), then test chunk size and overlap on all 51 questions instead of tuning on a single failure.
+Chunk sizes of 100, 150 and 400 words all matched or slightly beat the baseline at every k and found the baseline's one miss, but the gains are one or two questions out of 51, and the heavily truncated 400-word chunks scored as well as the best smaller setup. Page-level Hit@k therefore does not separate these setups. A second embedding model was not run. A chunk-level check on 21 hand-marked questions did separate them (see above): Chunk-Hit@5 rose with chunk size, from 0.86 at 100 and 150 words to 0.95 at 400, and the measles-risk chunk was missed at every size. Next steps: mark the remaining 30 questions in `eval/answer_spans.csv`, then test overlap and a second embedding model with the chunk-level check.

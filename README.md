@@ -15,11 +15,11 @@ It retrieves the most relevant passages for a question, answers using only those
 
 ## Project layout
 ```
-src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, llm, evaluate, answer_check
+src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, llm, evaluate, chunk_check, answer_check
 app.py         Streamlit interface
 tests/         unit tests (run in CI, no model downloads needed)
 data/raw/      cleaned .txt guidance pages (not committed; `fetch` can create these)
-eval/          eval_questions.csv (question, expected_source) and out_of_scope_questions.csv (question, note)
+eval/          eval_questions.csv (question, expected_source), out_of_scope_questions.csv (question, note) and answer_spans.csv (hand-written answer phrases for the chunk-level check)
 results/       saved output of real runs: retrieval baseline and answer-check reports
 docs/          architecture.md and evaluation.md
 .github/       CI workflow (tests and lint on every push)
@@ -40,6 +40,7 @@ python -m ragdemo.ingest            # writes data/chunks.jsonl
 python -m ragdemo.index             # writes data/index.faiss
 python -m ragdemo.evaluate          # prints hit rate at k = 1, 3, 5
 python -m ragdemo.evaluate --misses # also lists questions whose source was not in the top 5
+python -m ragdemo.chunk_check       # is the chunk holding the answer in the top k? (uses eval/answer_spans.csv)
 python -m ragdemo.answer_check --out results/answer_check_ollama.md   # needs an LLM backend (see below)
 streamlit run app.py
 ```
@@ -84,13 +85,24 @@ Compare a few setups and record the results here.
 
 Overlap was 20% of the chunk size in every run (40, 20, 30 and 80 words). With 51 questions, one question is about 0.02, so the gains over the baseline are one or two questions and could be noise. The baseline's 200-word chunks are often longer than the embedding model's 256-token input limit (55% of them); the 100- and 150-word chunks almost all fit. The 400-word chunks are mostly cut off by that limit (93% are over it) yet scored as well as the best smaller setup, so page-level Hit@k does not show the cost of truncation, and it is not comparable across chunk sizes because the top 5 cover more text when chunks are larger. See `docs/evaluation.md`.
 
+**Chunk-level check.** `python -m ragdemo.chunk_check` asks a stricter question: is the chunk that contains the answer in the top k? It uses a short phrase I copied by hand from the answering sentence for 21 of the 51 questions (`eval/answer_spans.csv`), so it covers fewer questions than the table above and the two are not comparable. Raw output: `results/chunk_check_baseline.txt`, `results/chunk_check_chunk100.txt`, `results/chunk_check_chunk150.txt` and `results/chunk_check_chunk400.txt`.
+
+| Chunk size (words) | Chunks | Chunk-Hit@1 | Chunk-Hit@3 | Chunk-Hit@5 |
+|--------------------|--------|-------------|-------------|-------------|
+| 100 | 651 | 0.43 | 0.71 | 0.86 |
+| 150 | 436 | 0.57 | 0.71 | 0.86 |
+| 200 (baseline) | 330 | 0.62 | 0.81 | 0.90 |
+| 400 | 169 | 0.71 | 0.86 | 0.95 |
+
+Same embedding model and 20% overlap throughout. One question is about 0.05 here, so the gaps are a few questions. The ranking at the small end is the reverse of page-level Hit@k: 100 and 150 words were slightly ahead of the baseline there and are behind it here. The measles-risk question (answer in chunk 0) was missed at every chunk size, and 400 words missed only that one. Larger chunks are an easier target and the top 5 cover more text, so this is still not a fully fair comparison.
+
 ## What I learned
-Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts, although the local model blended flu and COVID guidance on one boundary question. The main weakness is at chunk level: for one question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. Chunk sizes of 100, 150 and 400 words all scored about the same as the 200-word baseline (within one or two questions), even though 93% of the 400-word chunks exceed the embedding model's 256-token limit, so page-level Hit@k could not separate them. I would add a chunk-level check (is the answering chunk in the top k?) before choosing a chunk size, rather than tuning on a single failure. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off).
+Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts, although the local model blended flu and COVID guidance on one boundary question. The main weakness is at chunk level: for the measles-risk question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. A chunk-level check on 21 hand-marked questions does see it: Chunk-Hit@5 was 0.90 at the baseline, and that question was missed at every chunk size I tried. Chunk sizes of 100, 150 and 400 words all scored about the same as the 200-word baseline on page-level Hit@k (within one or two questions), even though 93% of the 400-word chunks exceed the embedding model's 256-token limit. The chunk-level check separated them: larger chunks did better (Chunk-Hit@5 0.86 at 100 and 150 words, 0.90 at 200, 0.95 at 400), but on only 21 questions and with larger chunks being an easier target, so I would not pick 400 words from this alone. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off).
 
 ## Limitations
 - Answers are only as good as the retrieved passages. The model is told to say when the sources do not contain the answer.
 - Answer quality was judged by one person on 12 questions per model, with no scoring metric, so treat it as a spot check and not a benchmark.
-- A second embedding model was not evaluated, and Hit@k is page-level, so it cannot tell whether the chunk holding the answer is retrieved.
+- A second embedding model was not evaluated. Hit@k is page-level, and the chunk-level check covers only the 21 questions I marked by hand.
 - The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
 - This is a demo built on public data. It is not medical advice.
 
