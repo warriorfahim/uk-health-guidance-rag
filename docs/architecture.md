@@ -73,9 +73,9 @@ What the code does, with the reasons still to add:
 ## Limitations and future work
 
 - Answers are only as good as the retrieved passages. Hit@k is measured at page level, so it cannot see a case where the right page is retrieved but not the chunk holding the answer (the measles-risk question in `docs/evaluation.md`).
-- Retrieval baseline: Hit@1 0.90, Hit@3 0.98, Hit@5 0.98 on 51 questions (`results/retrieval_baseline.txt`). Other chunk sizes scored the same or slightly higher (100 words: 0.92, 0.98, 1.00; 150 words: 0.94, 0.98, 1.00; 400 words: 0.94, 0.98, 1.00; see `docs/evaluation.md`). A second embedding model is not yet run.
-- 55% of the baseline chunks exceed the embedding model's 256-token limit, so their later text does not influence retrieval. This may relate to the measles-risk miss, but that is not tested. Options to try: shorter chunks, or a model with a longer input limit.
+- Retrieval baseline: Hit@1 0.90, Hit@3 0.98, Hit@5 0.98 on 51 questions (`results/retrieval_baseline.txt`). Other chunk sizes scored the same or slightly higher (100 words: 0.92, 0.98, 1.00; 150 words: 0.94, 0.98, 1.00; 400 words: 0.94, 0.98, 1.00; see `docs/evaluation.md`). A second embedding model, `BAAI/bge-small-en-v1.5` (512-token limit), scored 0.98, 1.00, 1.00 on the baseline chunks (`results/retrieval_bge_small.txt`); it was only run as an experiment, and the code still defaults to `all-MiniLM-L6-v2`.
+- 55% of the baseline chunks exceed the embedding model's 256-token limit, so their later text does not influence retrieval. This may relate to the measles-risk miss, but that is not tested. Shorter chunks and a model with a longer input limit (bge-small-en-v1.5) both did as well or better, but neither isolates truncation as the cause.
 - Answer quality was judged by one person on 12 questions per model, so it is a spot check, not a benchmark.
 - Grounding relies on the prompt alone; there is no automatic check that an answer is supported by the sources or that its citations are correct.
 - A chunk-level check (`chunk_check.py`, `eval/answer_spans.csv`) exists, but only 21 of 51 questions have a hand-written answer phrase. On those, Chunk-Hit@5 was 0.86 (100 and 150 words), 0.90 (200) and 0.95 (400); see `docs/evaluation.md`.
-- Future work: mark the remaining questions, then test overlap and a second embedding model with the chunk-level check.
+- Future work: mark the remaining questions, then test overlap, bge's query prefix, and whether to switch the default embedding model.
