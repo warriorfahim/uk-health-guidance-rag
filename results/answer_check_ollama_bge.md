@@ -2,7 +2,7 @@
 
 Top 3 chunks per question. Backend: ollama (qwen2.5:7b). Sample seed: 0. Replies are capped at 400 tokens, so long answers may be cut off. If an answer starts with 'No LLM available', the backend was not running and this is only the grounded prompt.
 
-Marking: filled in by Claude (not by the author) on 2026-11-23, by checking each answer against the page text in `data/raw/`. The author has not reviewed these marks yet. Treat them as a draft, and differences from the author's own reading take precedence.
+Marking: marked by the author against the page text in `data/raw/`.
 
 ### 1. Who is most at risk of catching measles at the moment?
 

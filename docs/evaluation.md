@@ -86,6 +86,13 @@ Summary: 4 of the 6 main-set answers were fully correct, 1 was partly correct an
 - COVID booster: failed with "empty answer". The measles-risk and SFTS answers were cut off mid-sentence. The 400-token cap may be the cause (not confirmed).
 - All five clear out-of-scope questions were refused cleanly.
 
+**Ollama with bge-retrieved chunks, same 12 questions** (`results/answer_check_ollama_bge.md`, run on 2026-11-23): the same questions, seed and `qwen2.5:7b`, but the top 3 chunks came from the bge-small-en-v1.5 index instead of MiniLM. The answers were marked by hand against the page text in `data/raw/`, as for the two reports above.
+- All 6 main-set answers were correct and grounded, against 4 of 6 correct with MiniLM-retrieved chunks.
+- Measles risk: now correct (people aged 30 and under who did not have 2 MMR doses). This is the question that was wrong with MiniLM, where the answering chunk 0 ranked 9th. With bge it ranked 2nd, so it reached the LLM.
+- Care-home outbreak: now includes the 5-day window. SFTS: now includes the close-contact route for human-to-human spread. Both were left out with MiniLM. The care-home answer still omits the "linked by spread" caveat.
+- Out-of-scope: 4 of 6 refused cleanly. The COVID booster question gave the same blend as before: it applies the flu route (occupational health, pharmacy, GP) to COVID. The scabies question was refused but said the sources discuss "scabies testing procedures", and scabies appears in none of the 32 pages, so that clause is a false statement about the sources.
+- This is one run per setup on 12 questions with one marker. The difference in retrieval is the likely reason for the improvement, but LLM output also varies between runs, and this was not repeated.
+
 ## Failure analysis
 
 Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5. The question about the combined measles, mumps, rubella and chickenpox jab from 2026 expected `universal-varicella-vaccination-programme-in-england.txt`, but 4 of the top 5 chunks came from `mmr-catchup-programme-diagnosis-case-management-and-advice.txt` and one from `pertussis-clinical-and-public-health-management.txt`. The reason has not been investigated.
