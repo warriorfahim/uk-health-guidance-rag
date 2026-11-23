@@ -17,7 +17,7 @@ People aged 30 and under who did not receive 2 doses of MMR vaccine as children 
 - Correct? (yes/no/partly): yes
 - Grounded in the sources? (yes/no): yes
 - Citations point to the right source? (yes/no): yes
-- Notes: Matches the answering sentence (people aged 30 and under who did not receive 2 MMR doses). The MiniLM run answered this wrongly; here chunk 0 was retrieved at rank 2.
+- Notes: Matches the answering sentence (people aged 30 and under who did not receive 2 MMR doses). The MiniLM run answered this wrongly; here the answering chunk was retrieved (it was not in MiniLM's top 5).
 
 ### 2. Which hantavirus is treated as an airborne high consequence infection in the UK because it can pass between people?
 

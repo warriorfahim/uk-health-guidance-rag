@@ -3,7 +3,7 @@
 A small semantic search and retrieval-augmented question answering (RAG) demo over public UK health guidance.
 It retrieves the most relevant passages for a question, answers using only those passages, and shows the sources.
 
-> Status: work in progress. The baseline retrieval run and a manual answer check are done. Chunk sizes of 100, 150 and 400 words and a second embedding model (bge-small-en-v1.5) have been run.
+> Status: work in progress. Done: the baseline retrieval run, chunk sizes of 100, 150 and 400 words, a second embedding model (bge-small-en-v1.5), a chunk-level check on 21 hand-marked questions, and manual answer checks (Ollama and OpenRouter on the baseline, plus Ollama on bge-retrieved chunks). The app still uses `all-MiniLM-L6-v2`; bge was only an experiment. Not done: marking the other 30 questions for the chunk-level check, and choosing a default embedding model.
 
 ## What it does
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
@@ -11,7 +11,8 @@ It retrieves the most relevant passages for a question, answers using only those
 3. Retrieves the top-k chunks for a query (semantic search).
 4. Builds a prompt that asks an LLM to answer using only the retrieved text and to cite its sources. The Streamlit app sends it to a local Ollama model by default (`qwen2.5:7b`), or to OpenRouter if you pick it (see "Connecting an LLM"). A Hugging Face backend is still in the code but is not supported.
 5. Evaluates retrieval on a hand-written question set (hit rate at k).
-6. Runs a manual answer check: a sample of questions goes through retrieval and the LLM, and a report is written for you to mark by hand.
+6. Runs a chunk-level check: for questions where a short answer phrase was copied by hand from the page, it tests whether the chunk containing that phrase is in the top k.
+7. Runs a manual answer check: a sample of questions goes through retrieval and the LLM, and a report is written for you to mark by hand.
 
 ## Project layout
 ```
@@ -20,7 +21,7 @@ app.py         Streamlit interface
 tests/         unit tests (run in CI, no model downloads needed)
 data/raw/      cleaned .txt guidance pages (not committed; `fetch` can create these)
 eval/          eval_questions.csv (question, expected_source), out_of_scope_questions.csv (question, note) and answer_spans.csv (hand-written answer phrases for the chunk-level check)
-results/       saved output of real runs: retrieval baseline and answer-check reports
+results/       saved output of real runs: page-level retrieval (baseline, chunk sizes, bge), chunk-level checks, token-length check and answer-check reports
 docs/          architecture.md and evaluation.md
 .github/       CI workflow (tests and lint on every push)
 ```
@@ -72,8 +73,7 @@ The app's sidebar has an "LLM backend" selector, so you can switch between Ollam
 If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM. Answer quality was checked by hand on a small sample (see `docs/evaluation.md`).
 
 ## Evaluation
-`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt` `results/retrieval_chunk400.txt` and `results/retrieval_bge_small.txt`. Answers from two LLMs were also spot-checked by hand on 12 questions each, and the local model was re-run with bge-retrieved chunks (`results/answer_check_ollama_bge.md`); see `docs/evaluation.md`.
-Compare a few setups and record the results here.
+`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw page-level output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt`, `results/retrieval_chunk400.txt` and `results/retrieval_bge_small.txt`. Answers from two LLMs were also spot-checked by hand on 12 questions each, and the local model was re-run with bge-retrieved chunks (`results/answer_check_ollama_bge.md`); see `docs/evaluation.md`.
 
 | Setup | Chunk size (words) | Embedding model | Hit@1 | Hit@3 | Hit@5 |
 |-------|--------------------|-----------------|-------|-------|-------|
@@ -103,14 +103,22 @@ Same embedding model and 20% overlap throughout. One question is about 0.05 here
 | all-MiniLM-L6-v2 (baseline) | 0.90 | 0.98 | 0.98 | 0.62 | 0.81 | 0.90 |
 | bge-small-en-v1.5 | 0.98 | 1.00 | 1.00 | 0.62 | 0.86 | 0.95 |
 
-Page-level Hit@ is on 51 questions, Chunk-Hit@ on the 21 hand-marked ones. bge missed no question at k=5 at page level, and the measles-risk chunk was found. Its one chunk-level miss was the tick-borne encephalitis milk question. The models differ in training and architecture as well as input length, so this does not show that truncation caused the baseline's misses.
+Page-level Hit@k is on 51 questions, Chunk-Hit@k on the 21 hand-marked ones. bge missed no question at k=5 at page level, and the measles-risk chunk was found in its top 5 (it was not in MiniLM's top 5). Its one chunk-level miss was the tick-borne encephalitis milk question. The models differ in training and architecture as well as input length, so this does not show that truncation caused the baseline's misses.
+
+The app and the Quick start still use `all-MiniLM-L6-v2`, set as the default in `ragdemo.index`. The bge numbers came from running `ragdemo.index.main(model_name="BAAI/bge-small-en-v1.5", index_path="data/index_bge.faiss")` and then pointing `Retriever` at that index and model with a short script. `evaluate` and `chunk_check` have no model option yet, so repeating the bge rows needs that small change (not yet implemented).
 
 ## What I learned
-Retrieval worked well on this corpus (Hit@5 0.98 on 51 questions), and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts, although the local model blended flu and COVID guidance on one boundary question. The main weakness is at chunk level: for the measles-risk question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. A chunk-level check on 21 hand-marked questions does see it: Chunk-Hit@5 was 0.90 at the baseline, and that question was missed at every chunk size I tried. Chunk sizes of 100, 150 and 400 words all scored about the same as the 200-word baseline on page-level Hit@k (within one or two questions), even though 93% of the 400-word chunks exceed the embedding model's 256-token limit. The chunk-level check separated them: larger chunks did better (Chunk-Hit@5 0.86 at 100 and 150 words, 0.90 at 200, 0.95 at 400), but on only 21 questions and with larger chunks being an easier target, so I would not pick 400 words from this alone. The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off). Re-running the same 12 questions with Ollama on bge-retrieved chunks, the measles-risk question was answered correctly (the answering chunk ranked 2nd instead of 9th), and all 6 main-set answers were correct against 4 of 6 before. The COVID booster question was still blended with flu guidance, and the scabies refusal falsely said the sources mention scabies testing. One run on 12 questions, so I read this as a sign, not proof.
+- **Retrieval found the right page.** The baseline scored Hit@5 0.98 on 51 questions, and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts. The local model blended flu and COVID guidance on one boundary question.
+- **The main weakness is at chunk level.** For the measles-risk question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. A chunk-level check on 21 hand-marked questions does see it: Chunk-Hit@5 was 0.90 at the baseline, and that question was missed at every chunk size I tried.
+- **Chunk size.** 100, 150 and 400 words all scored about the same as the 200-word baseline on page-level Hit@k (within one or two questions), even though 93% of the 400-word chunks exceed the embedding model's 256-token limit. The chunk-level check separated them: larger chunks did better (Chunk-Hit@5 0.86 at 100 and 150 words, 0.90 at 200, 0.95 at 400). That is on only 21 questions and larger chunks are an easier target, so I would not pick 400 words from this alone.
+- **Embedding model.** bge-small-en-v1.5 (512-token limit) scored higher than MiniLM at page level (Hit@1 0.98 against 0.90, no misses at k=5) and a little higher at chunk level (Chunk-Hit@5 0.95 against 0.90), and it found the measles-risk chunk. The two models differ in more than input length, so this does not show that truncation was the cause.
+- **LLM answers.** The free OpenRouter model was more cautious but less dependable than local Ollama (one empty answer, two cut off). Re-running the same 12 questions with Ollama on bge-retrieved chunks, the measles-risk question was answered correctly and all 6 main-set answers were correct, against 4 of 6 before. The COVID booster question was still blended with flu guidance, and the scabies refusal falsely said the sources mention scabies testing. One run on 12 questions, so I read this as a sign, not proof.
 
 ## Limitations
 - Answers are only as good as the retrieved passages. The model is told to say when the sources do not contain the answer.
-- Answer quality was judged by one person on 12 questions per model, with no scoring metric, so treat it as a spot check and not a benchmark.- Only one other embedding model was tried (bge-small-en-v1.5), once, without its query prefix. Hit@k is page-level, and the chunk-level check covers only the 21 questions I marked by hand.
+- Answer quality was judged by one person on 12 questions per model, with no scoring metric, so treat it as a spot check and not a benchmark.
+- Only one other embedding model was tried (bge-small-en-v1.5), once, without its query prefix. Hit@k is page-level, and the chunk-level check covers only 21 of the 51 questions. I chose which 21 to mark, so they are not a random sample.
+- The bge rows were produced with a short script and cannot be repeated from the command line yet (see the note under the embedding-model table).
 - The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
 - This is a demo built on public data. It is not medical advice.
 
