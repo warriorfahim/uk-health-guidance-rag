@@ -1,7 +1,7 @@
 """Embed chunks and build a FAISS index (heavy imports are inside functions)."""
 import json
 
-DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_MODEL = "BAAI/bge-small-en-v1.5"  # was all-MiniLM-L6-v2 until 2026-11-23; see docs/evaluation.md
 
 
 def add_model_args(parser) -> None:
