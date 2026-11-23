@@ -1,6 +1,6 @@
 # Architecture
 
-> Status: the pipeline, components and data sections describe what the code does today. Items marked "to add" are design reasons that only the author can state.
+> Status: the pipeline, components and data sections describe what the code does today. The design reasons for chunking and the index were drafted from the code and results, not recorded at the time; the author should confirm them.
 
 ## Overview
 
@@ -62,10 +62,10 @@ answer with citations  →  app.py (Streamlit UI)
 
 ## Design decisions and trade-offs
 
-What the code does, with the reasons still to add:
+What the code does, and why. The reasons for chunking and the index were drafted by Claude from the code and the saved results, not recorded when the choices were made:
 
-- **Word-based chunking** (not token-based): chunks are counted in whitespace-separated words. Reason and trade-off: to add.
-- **Flat FAISS index** (`IndexFlatIP`, exact search) instead of an approximate index: with 330 chunks it is fast enough. Reason and trade-off: to add.
+- **Word-based chunking** (not token-based): chunks are counted in whitespace-separated words (`text.split()`). Reason: it needs no tokenizer, so the same chunks work with any embedding model and the chunk size is easy to reason about (the chunk-size experiments used 100, 150, 200 and 400 words). Trade-off: words are not tokens. Under MiniLM's tokenizer a 200-word chunk has a median of 259 tokens, so 55% exceed its 256-token limit (`results/embedding_token_check.txt`), and the chunk size that fits a model's limit depends on the model. Splitting on whitespace also drops the pages' line breaks, so the chunk text is flattened to one paragraph.
+- **Flat FAISS index** (`IndexFlatIP`, exact search) instead of an approximate index: with 330 chunks it is fast enough. Reason: exact search compares the query with every chunk, so the results are never an approximation, and there is nothing to train or tune. Trade-off: the cost grows linearly with the number of chunks, so a much larger corpus (tens of thousands of chunks or more) would need an approximate index. Search time was not measured here.
 - **Grounding in the prompt:** the prompt tells the model to answer only from the numbered sources, cite them like [1], and say when it cannot answer. This is enforced by the instruction alone; nothing checks the output, so the manual answer check is how it was assessed (see `docs/evaluation.md`).
 - **Pluggable LLM:** `answer.answer` takes any `generate(prompt) -> str` callable, so backends can be swapped without changing retrieval or the prompt.
 - **Lazy heavy imports:** `faiss` and `sentence_transformers` are imported inside functions so the unit tests and CI run without them and without downloading models.
