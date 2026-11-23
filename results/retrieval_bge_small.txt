@@ -1,0 +1,9 @@
+# Retrieval, bge-small-en-v1.5, 200-word chunks, run on 2026-11-23
+# command: python -m ragdemo.evaluate --misses with Retriever pointed at data/index_bge.faiss (built by ragdemo.index with model_name=BAAI/bge-small-en-v1.5)
+# model=BAAI/bge-small-en-v1.5 (33.4M params, 384-dim, max_seq_length 512, no query instruction prefix), chunk size=200 words, overlap=40, 330 chunks (same chunks.jsonl as the baseline), 0 of 330 chunks over the 512-token limit, 51 questions
+
+Hit@1: 0.98
+Hit@3: 1.00
+Hit@5: 1.00
+
+Missed at k=5: 0 of 51

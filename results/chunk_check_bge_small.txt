@@ -1,0 +1,14 @@
+# Chunk-level retrieval check, bge-small-en-v1.5, 200-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check with Retriever pointed at data/index_bge.faiss
+# model=BAAI/bge-small-en-v1.5 (33.4M params, 384-dim, max_seq_length 512, no query instruction prefix), chunk size=200 words, overlap=40, 330 chunks (same chunks.jsonl as the baseline), 0 of 330 chunks over the 512-token limit, 21 of 51 questions have a hand-written answer_text
+
+21 of 51 questions have an answer_text in eval/answer_spans.csv
+Checked 21 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.62
+Chunk-Hit@3: 0.86
+Chunk-Hit@5: 0.95
+
+Answering chunk not in the top 5: 1 of 21
+- Can you catch tick-borne encephalitis from unpasteurised milk products?
+    answering chunk(s): tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#4
+    got: tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#6, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#0, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#8, severe-fever-with-thrombocytopaenia-syndrome-sfts-epidemiology-outbreaks-and-gui.txt#5, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#1
