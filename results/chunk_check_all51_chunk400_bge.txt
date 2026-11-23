@@ -1,0 +1,12 @@
+# Chunk-level retrieval check on all 51 questions, BAAI/bge-small-en-v1.5, 400-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check --model BAAI/bge-small-en-v1.5 --index data/index_s400_bge.faiss (after ingest size=400 overlap=80, then ragdemo.index with the same model and index)
+# chunk size=400 words, overlap=80, model=BAAI/bge-small-en-v1.5, 169 chunks, 32 pages, 51 of 51 questions have a hand-written answer_text
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: BAAI/bge-small-en-v1.5, index: data/index_s400_bge.faiss
+Checked 51 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.84
+Chunk-Hit@3: 0.96
+Chunk-Hit@5: 1.00
+
+Answering chunk not in the top 5: 0 of 51

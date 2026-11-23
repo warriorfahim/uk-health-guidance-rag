@@ -1,0 +1,10 @@
+# Retrieval, bge-small-en-v1.5, 400-word chunks, run on 2026-11-23
+# command: python -m ragdemo.evaluate --misses --model BAAI/bge-small-en-v1.5 --index data/index_s400_bge.faiss (after ingest size=400 overlap=80, then ragdemo.index)
+# chunk size=400 words, overlap=80, model=BAAI/bge-small-en-v1.5, 169 chunks, 32 pages, 51 questions
+
+Model: BAAI/bge-small-en-v1.5, index: data/index_s400_bge.faiss
+Hit@1: 1.00
+Hit@3: 1.00
+Hit@5: 1.00
+
+Missed at k=5: 0 of 51

@@ -1,0 +1,18 @@
+# Chunk-level retrieval check on all 51 questions, sentence-transformers/all-MiniLM-L6-v2, 400-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check --model sentence-transformers/all-MiniLM-L6-v2 --index data/index_s400_minilm.faiss (after ingest size=400 overlap=80, then ragdemo.index with the same model and index)
+# chunk size=400 words, overlap=80, model=sentence-transformers/all-MiniLM-L6-v2, 169 chunks, 32 pages, 51 of 51 questions have a hand-written answer_text
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: sentence-transformers/all-MiniLM-L6-v2, index: data/index_s400_minilm.faiss
+Checked 51 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.78
+Chunk-Hit@3: 0.92
+Chunk-Hit@5: 0.96
+
+Answering chunk not in the top 5: 2 of 51
+- Who is most at risk of catching measles at the moment?
+    answering chunk(s): mmr-catchup-programme-diagnosis-case-management-and-advice.txt#0
+    got: mmr-catchup-programme-diagnosis-case-management-and-advice.txt#1, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#3, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#2, national-contingency-plan-for-west-nile-virus-in-england.txt#3, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#14
+- Why is south-east England considered a place where invasive Aedes mosquitoes could survive?
+    answering chunk(s): national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#6
+    got: national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#0, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#7, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#34, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#2, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#1

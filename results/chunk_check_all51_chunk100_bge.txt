@@ -1,0 +1,30 @@
+# Chunk-level retrieval check on all 51 questions, BAAI/bge-small-en-v1.5, 100-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check --model BAAI/bge-small-en-v1.5 --index data/index_s100_bge.faiss (after ingest size=100 overlap=20, then ragdemo.index with the same model and index)
+# chunk size=100 words, overlap=20, model=BAAI/bge-small-en-v1.5, 651 chunks, 32 pages, 51 of 51 questions have a hand-written answer_text
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: BAAI/bge-small-en-v1.5, index: data/index_s100_bge.faiss
+Checked 51 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.57
+Chunk-Hit@3: 0.76
+Chunk-Hit@5: 0.88
+
+Answering chunk not in the top 5: 6 of 51
+- What are the different forms anthrax can take in a patient, depending on how they were exposed?
+    answering chunk(s): anthrax-guidance-for-testing.txt#1
+    got: anthrax-guidance-for-testing.txt#7, anthrax-guidance-for-testing.txt#6, anthrax-guidance-for-testing.txt#2, anthrax-guidance-for-testing.txt#4, anthrax-guidance-for-testing.txt#10
+- Which UKHSA research centre works on new treatments and vaccines for drug-resistant infections?
+    answering chunk(s): antimicrobial-resistance-amr.txt#0
+    got: antimicrobial-resistance-amr.txt#1, antimicrobial-resistance-amr.txt#2, universal-varicella-vaccination-programme-in-england.txt#7, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#41, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#40
+- Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?
+    answering chunk(s): diphtheria-migrant-health-guide.txt#0
+    got: diphtheria-migrant-health-guide.txt#9, diphtheria-migrant-health-guide.txt#10, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#4, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#111, plague-epidemiology-outbreaks-and-guidance.txt#10
+- How do the death rates compare for the kidney-related and the lung-related hantavirus illnesses?
+    answering chunk(s): hantaviruses.txt#1
+    got: hantaviruses.txt#11, hantaviruses.txt#10, hantaviruses.txt#13, hantaviruses.txt#9, hantaviruses.txt#2
+- Can you catch tick-borne encephalitis from unpasteurised milk products?
+    answering chunk(s): tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#8
+    got: tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#0, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#12, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#2, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#16, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#17
+- Why is south-east England considered a place where invasive Aedes mosquitoes could survive?
+    answering chunk(s): national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#26
+    got: national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#1, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#2, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#5, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#59, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#28

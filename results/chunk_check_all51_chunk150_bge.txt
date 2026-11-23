@@ -1,0 +1,27 @@
+# Chunk-level retrieval check on all 51 questions, BAAI/bge-small-en-v1.5, 150-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check --model BAAI/bge-small-en-v1.5 --index data/index_s150_bge.faiss (after ingest size=150 overlap=30, then ragdemo.index with the same model and index)
+# chunk size=150 words, overlap=30, model=BAAI/bge-small-en-v1.5, 436 chunks, 32 pages, 51 of 51 questions have a hand-written answer_text
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: BAAI/bge-small-en-v1.5, index: data/index_s150_bge.faiss
+Checked 51 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.63
+Chunk-Hit@3: 0.88
+Chunk-Hit@5: 0.90
+
+Answering chunk not in the top 5: 5 of 51
+- Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?
+    answering chunk(s): diphtheria-migrant-health-guide.txt#0
+    got: diphtheria-migrant-health-guide.txt#5, diphtheria-migrant-health-guide.txt#6, diphtheria-migrant-health-guide.txt#7, diphtheria-migrant-health-guide.txt#8, diphtheria-migrant-health-guide.txt#4
+- Which country has reported the majority of MERS cases since 2012?
+    answering chunk(s): mers-cov-background-information.txt#0
+    got: mers-cov-background-information.txt#7, mers-cov-background-information.txt#6, mers-cov-background-information.txt#4, mers-cov-background-information.txt#9, mers-cov-background-information.txt#8
+- At what temperature does cold weather start to count as a health risk for vulnerable patients?
+    answering chunk(s): supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#0
+    got: supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#4, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#5, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#2, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#6, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#1
+- Can you catch tick-borne encephalitis from unpasteurised milk products?
+    answering chunk(s): tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#5
+    got: tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#8, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#0, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#11, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#1, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#10
+- Why is south-east England considered a place where invasive Aedes mosquitoes could survive?
+    answering chunk(s): national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#17
+    got: national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#18, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#3, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#1, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#39, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#0

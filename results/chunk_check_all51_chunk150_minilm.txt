@@ -1,0 +1,30 @@
+# Chunk-level retrieval check on all 51 questions, sentence-transformers/all-MiniLM-L6-v2, 150-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check --model sentence-transformers/all-MiniLM-L6-v2 --index data/index_s150_minilm.faiss (after ingest size=150 overlap=30, then ragdemo.index with the same model and index)
+# chunk size=150 words, overlap=30, model=sentence-transformers/all-MiniLM-L6-v2, 436 chunks, 32 pages, 51 of 51 questions have a hand-written answer_text
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: sentence-transformers/all-MiniLM-L6-v2, index: data/index_s150_minilm.faiss
+Checked 51 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.61
+Chunk-Hit@3: 0.80
+Chunk-Hit@5: 0.88
+
+Answering chunk not in the top 5: 6 of 51
+- Roughly how many people die from Crimean-Congo fever around the world each year?
+    answering chunk(s): crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt#1
+    got: crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt#0, hepatitis-b-migrant-health-guide.txt#2, ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt#6, ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt#21, ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt#19
+- Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?
+    answering chunk(s): diphtheria-migrant-health-guide.txt#0
+    got: diphtheria-migrant-health-guide.txt#6, diphtheria-migrant-health-guide.txt#4, diphtheria-migrant-health-guide.txt#5, diphtheria-migrant-health-guide.txt#8, diphtheria-migrant-health-guide.txt#1
+- Which country has reported the majority of MERS cases since 2012?
+    answering chunk(s): mers-cov-background-information.txt#0
+    got: mers-cov-background-information.txt#7, ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt#21, mers-cov-background-information.txt#8, mers-cov-background-information.txt#9, mers-cov-background-information.txt#5
+- Who is most at risk of catching measles at the moment?
+    answering chunk(s): mmr-catchup-programme-diagnosis-case-management-and-advice.txt#0
+    got: mmr-catchup-programme-diagnosis-case-management-and-advice.txt#3, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#10, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#9, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#8, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#6
+- At what temperature does cold weather start to count as a health risk for vulnerable patients?
+    answering chunk(s): supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#0
+    got: supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#2, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#18, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#4, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#1, supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt#5
+- Why is south-east England considered a place where invasive Aedes mosquitoes could survive?
+    answering chunk(s): national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#17
+    got: national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#0, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#3, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#38, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#91, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#19
