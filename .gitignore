@@ -4,5 +4,6 @@ __pycache__/
 data/raw/
 data/chunks.jsonl
 data/index.faiss
+data/index_*.faiss
 .DS_Store
 rag_demo/
