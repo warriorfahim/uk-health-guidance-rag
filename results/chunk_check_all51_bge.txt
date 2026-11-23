@@ -1,0 +1,18 @@
+# Chunk-level retrieval check on all 51 questions, bge-small-en-v1.5 (default), 200-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check (index built with python -m ragdemo.index, default model)
+# chunk size=200 words, overlap=40, model=BAAI/bge-small-en-v1.5, 330 chunks, 32 pages, 51 of 51 questions have a hand-written answer_text
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: BAAI/bge-small-en-v1.5, index: data/index.faiss
+Checked 51 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.65
+Chunk-Hit@3: 0.90
+Chunk-Hit@5: 0.96
+
+Answering chunk not in the top 5: 2 of 51
+- Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?
+    answering chunk(s): diphtheria-migrant-health-guide.txt#0
+    got: diphtheria-migrant-health-guide.txt#5, diphtheria-migrant-health-guide.txt#4, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#2, diphtheria-migrant-health-guide.txt#3, diphtheria-migrant-health-guide.txt#6
+- Can you catch tick-borne encephalitis from unpasteurised milk products?
+    answering chunk(s): tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#4
+    got: tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#6, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#0, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#8, severe-fever-with-thrombocytopaenia-syndrome-sfts-epidemiology-outbreaks-and-gui.txt#5, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#1

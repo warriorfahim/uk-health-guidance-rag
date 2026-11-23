@@ -34,7 +34,7 @@ answer with citations  →  app.py (Streamlit UI)
 | `fetch.py` | Find GOV.UK pages (`discover`) and download them as plain text (`fetch`) | Standard library only. Pages under 100 words and failed requests are skipped. Writes `data/raw/manifest.csv` (source, title, url, updated, licence). |
 | `chunking.py` | Split text into overlapping chunks | Word-based: default 200 words with 40 overlap, split on whitespace. |
 | `ingest.py` | Read raw pages, write `chunks.jsonl` | One record per chunk: `source` (file name), `chunk_id`, `text`. Pages are read in sorted order. |
-| `index.py` | Embed chunks, build FAISS index | `all-MiniLM-L6-v2` embeddings, normalised, in an `IndexFlatIP` (cosine similarity). |
+| `index.py` | Embed chunks, build FAISS index | `BAAI/bge-small-en-v1.5` embeddings by default (`--model` / `--index` to change), normalised, in an `IndexFlatIP` (cosine similarity). |
 | `retrieve.py` | Semantic search over the index | Embeds the query with the same model; returns copies of the chunk records plus a `score`. |
 | `answer.py` | Build the grounded prompt | Numbered sources `[1] (file) text`, and rules to use only the sources, cite them, and say when they do not contain the answer. |
 | `llm.py` | LLM backends as `generate(prompt) -> str` | `ollama` (default), `openrouter`, `hf` (not supported) and `none`; falls back to echoing the prompt when a backend is unusable. |
@@ -52,12 +52,16 @@ answer with citations  →  app.py (Streamlit UI)
 
 ## Models
 
-- **Embedding model:** `sentence-transformers/all-MiniLM-L6-v2` (22.7 million parameters, 384-dimensional vectors), used both to build the index and to embed queries. Why it fits this project:
+- **Embedding model:** `BAAI/bge-small-en-v1.5` (33.4 million parameters, 384-dimensional vectors, 512-token input limit), used both to build the index and to embed queries. It became the default on 2026-11-23; the model before that was `sentence-transformers/all-MiniLM-L6-v2` (22.7 million parameters, 256-token limit), which the baseline and chunk-size results used. Why bge:
   - It is open source and runs locally on a CPU, so no text leaves the machine, in line with the local-first LLM choice.
-  - It is small and fast, which suits 330 chunks and a laptop.
-  - It is the standard example model in the sentence-transformers documentation, so it is a sensible, well-known baseline.
-  - It scored Hit@5 0.98 on the 51-question set (`results/retrieval_baseline.txt`).
-  - Caveat: it reads at most 256 tokens per input and ignores the rest. 183 of the 330 baseline chunks (55%) are longer than that (median 259 tokens, maximum 409; `results/embedding_token_check.txt`), so for those chunks the last part of the text is not reflected in the embedding. With 100-word chunks none are over the limit (0 of 651) and with 150-word chunks 11 of 436 (3%); 400-word chunks are cut off much more (158 of 169, 93%), yet they scored as well on page-level Hit@k (see `docs/evaluation.md`), so that metric does not show the cost of truncation.
+  - At page level it was ahead: Hit@1/3/5 0.98, 1.00, 1.00 against 0.90, 0.98, 0.98 (`results/retrieval_bge_small.txt`).
+  - At chunk level on all 51 questions the result was mixed: Chunk-Hit@1/3/5 0.65, 0.90, 0.96 against 0.69, 0.88, 0.92 for MiniLM (`results/chunk_check_all51_bge.txt`, `results/chunk_check_all51_minilm.txt`). bge was behind by 2 questions at k=1 and ahead by 1 at k=3 (the k the app uses) and 2 at k=5, with 2 misses at k=5 against 4.
+  - In the 12-question answer check it answered 6 of 6 main-set questions correctly against 4 of 6 (`results/answer_check_ollama_bge.md`), from one run.
+  - The gaps are one to four questions, so this is a judgement from small differences that do not all point the same way, not a proven result.
+  - Its 512-token limit means none of the 330 baseline chunks (200 words) are cut off. The model differs from MiniLM in more than input length, so this does not prove truncation was the cause of MiniLM's misses.
+  - Cost: it is slower on CPU. Indexing the 330 chunks took about 98 s against 36 s, and embedding a question about 44 ms against 26 ms (`results/embedding_timing.txt`, one machine, rough). That is acceptable for a demo of this size.
+  - Not tried: bge's recommended query instruction prefix, and bge at other chunk sizes.
+  - MiniLM caveat (for the earlier results): it reads at most 256 tokens per input and ignores the rest. 183 of the 330 baseline chunks (55%) are longer than that (median 259 tokens, maximum 409; `results/embedding_token_check.txt`), so for those chunks the last part of the text is not reflected in the embedding. With 100-word chunks none are over the limit (0 of 651) and with 150-word chunks 11 of 436 (3%); 400-word chunks are cut off much more (158 of 169, 93%), yet they scored as well on page-level Hit@k (see `docs/evaluation.md`), so that metric does not show the cost of truncation.
 - **LLM:** The default LLM backend is local Ollama (qwen2.5:7b), chosen so that questions and retrieved text never leave the machine and there are no API costs or rate limits. OpenRouter is an optional backend, selected in the sidebar. It is used with a free open-source model, which may be rate-limited. It sends the question and retrieved text to a third party, with no guarantee the models are hosted in the UK. A Hugging Face backend is still in the code but is not supported: it requires a paid subscription, and calls without one fail with HTTP 402.
 
 ## Design decisions and trade-offs
@@ -73,9 +77,9 @@ What the code does, and why. The reasons for chunking and the index were drafted
 ## Limitations and future work
 
 - Answers are only as good as the retrieved passages. Hit@k is measured at page level, so it cannot see a case where the right page is retrieved but not the chunk holding the answer (the measles-risk question in `docs/evaluation.md`).
-- Retrieval baseline: Hit@1 0.90, Hit@3 0.98, Hit@5 0.98 on 51 questions (`results/retrieval_baseline.txt`). Other chunk sizes scored the same or slightly higher (100 words: 0.92, 0.98, 1.00; 150 words: 0.94, 0.98, 1.00; 400 words: 0.94, 0.98, 1.00; see `docs/evaluation.md`). A second embedding model, `BAAI/bge-small-en-v1.5` (512-token limit), scored 0.98, 1.00, 1.00 on the baseline chunks (`results/retrieval_bge_small.txt`); it was only run as an experiment, and the code still defaults to `all-MiniLM-L6-v2`.
-- 55% of the baseline chunks exceed the embedding model's 256-token limit, so their later text does not influence retrieval. This may relate to the measles-risk miss, but that is not tested. Shorter chunks and a model with a longer input limit (bge-small-en-v1.5) both did as well or better, but neither isolates truncation as the cause.
+- Retrieval baseline: Hit@1 0.90, Hit@3 0.98, Hit@5 0.98 on 51 questions (`results/retrieval_baseline.txt`). Other chunk sizes scored the same or slightly higher (100 words: 0.92, 0.98, 1.00; 150 words: 0.94, 0.98, 1.00; 400 words: 0.94, 0.98, 1.00; see `docs/evaluation.md`). A second embedding model, `BAAI/bge-small-en-v1.5` (512-token limit), scored 0.98, 1.00, 1.00 on the baseline chunks (`results/retrieval_bge_small.txt`); it is now the default embedding model (see Models above). The baseline and chunk-size rows above were all made with MiniLM.
+- 55% of the baseline chunks exceed MiniLM's 256-token limit, so their later text does not influence retrieval. This may relate to the measles-risk miss, but that is not tested. Shorter chunks and a model with a longer input limit (bge-small-en-v1.5) both did as well or better, but neither isolates truncation as the cause.
 - Answer quality was judged by one person on 12 questions per model, so it is a spot check, not a benchmark.
 - Grounding relies on the prompt alone; there is no automatic check that an answer is supported by the sources or that its citations are correct.
-- A chunk-level check (`chunk_check.py`, `eval/answer_spans.csv`) exists, but only 21 of 51 questions have a hand-written answer phrase. On those, Chunk-Hit@5 was 0.86 (100 and 150 words), 0.90 (200) and 0.95 (400); see `docs/evaluation.md`.
-- Future work: mark the remaining questions, then test overlap, bge's query prefix, and whether to switch the default embedding model.
+- A chunk-level check (`chunk_check.py`, `eval/answer_spans.csv`) exists and all 51 questions now have a hand-written answer phrase. The chunk-size runs (Chunk-Hit@5 0.86 at 100 and 150 words, 0.90 at 200, 0.95 at 400) used only the first 21 phrases and have not been repeated on all 51; see `docs/evaluation.md`.
+- Future work: re-run the chunk-size experiments at chunk level on all 51 questions (and with bge), and test overlap and bge's query prefix.

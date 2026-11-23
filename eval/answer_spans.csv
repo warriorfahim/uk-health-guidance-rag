@@ -1,36 +1,36 @@
 question,expected_source,answer_text
-"What are the different forms anthrax can take in a patient, depending on how they were exposed?",anthrax-guidance-for-testing.txt,
-Which anthrax outbreak affected drug users in the UK around 2009 to 2012?,anthrax-guidance-for-testing.txt,
-Which UKHSA research centre works on new treatments and vaccines for drug-resistant infections?,antimicrobial-resistance-amr.txt,
-Where does the name chikungunya come from and what does it mean?,chikungunya.txt,
-Can chikungunya be confused with dengue when a patient has fever and sore joints?,chikungunya.txt,
-Which ticks are the main carriers of Crimean-Congo haemorrhagic fever and are they established in Britain?,crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt,
-Roughly how many people die from Crimean-Congo fever around the world each year?,crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt,
-Why are chronic skin wounds in people who have recently arrived in the UK relevant to diphtheria?,diphtheria-migrant-health-guide.txt,
-Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?,diphtheria-migrant-health-guide.txt,
-Which Ebola virus caused the 2026 outbreak in eastern DRC and Uganda that WHO declared an international emergency?,ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt,
-What scheme should companies register with if their staff work in areas affected by Ebola or Marburg?,ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt,
+"What are the different forms anthrax can take in a patient, depending on how they were exposed?",anthrax-guidance-for-testing.txt,once the bacterial spores enter through a break in the skin
+Which anthrax outbreak affected drug users in the UK around 2009 to 2012?,anthrax-guidance-for-testing.txt,The most significant UK outbreak in humans was of injectional anthrax in 2009 to 2012 associated with the use of contaminated heroin
+Which UKHSA research centre works on new treatments and vaccines for drug-resistant infections?,antimicrobial-resistance-amr.txt,Vaccine Development and Evaluation Centre (VDEC) facilitates the development and evaluation of new vaccines and therapeutics
+Where does the name chikungunya come from and what does it mean?,chikungunya.txt,comes from a word in the Makonde language
+Can chikungunya be confused with dengue when a patient has fever and sore joints?,chikungunya.txt,often be misdiagnosed as other viral illnesses such as dengue fever
+Which ticks are the main carriers of Crimean-Congo haemorrhagic fever and are they established in Britain?,crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt,"nor are there any identified established populations of Hyalomma ticks, the principal vectors of CCHF virus"
+Roughly how many people die from Crimean-Congo fever around the world each year?,crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt,"10,000 and 15,000 human infections, including approximately 500 fatalities, occur annually"
+Why are chronic skin wounds in people who have recently arrived in the UK relevant to diphtheria?,diphtheria-migrant-health-guide.txt,often have poor skin integrity
+Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?,diphtheria-migrant-health-guide.txt,"all cases are notifiable on clinical suspicion, including both respiratory and cutaneous forms of the infection"
+Which Ebola virus caused the 2026 outbreak in eastern DRC and Uganda that WHO declared an international emergency?,ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt,new outbreak of Ebola disease caused by Bundibugyo virus affecting the DRC and Uganda
+What scheme should companies register with if their staff work in areas affected by Ebola or Marburg?,ebola-and-marburg-haemorrhagic-fevers-outbreaks-and-case-locations.txt,should register with the UK Health Security Agency (UKHSA) returning workers scheme
 How often do sexual health clinics in England have to send their data to UKHSA for the national STI surveillance system?,gumcad-sti-surveillance-system.txt,reported quarterly to UKHSA by all SHSs
-Which hantavirus is treated as an airborne high consequence infection in the UK because it can pass between people?,hantaviruses.txt,
-How do the death rates compare for the kidney-related and the lung-related hantavirus illnesses?,hantaviruses.txt,
-I have just come back from a country with Zika and I might be pregnant. What should I do?,health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt,
-What proportion of babies born to mothers infected with Zika in pregnancy end up with problems?,health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt,
-What extra care does a newborn need if the mother is living with hepatitis B?,hepatitis-b-migrant-health-guide.txt,
-How many people in the world are living with long-term hepatitis C and which region has the most?,hepatitis-c-migrant-health-guide.txt,
+Which hantavirus is treated as an airborne high consequence infection in the UK because it can pass between people?,hantaviruses.txt,Andes virus (ANDV) is classified as an airborne high consequence infectious disease (HCID)
+How do the death rates compare for the kidney-related and the lung-related hantavirus illnesses?,hantaviruses.txt,case fatality rates from less than 1% to 15%
+I have just come back from a country with Zika and I might be pregnant. What should I do?,health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt,You should inform your midwife of your travel
+What proportion of babies born to mothers infected with Zika in pregnancy end up with problems?,health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt,between 4% and 6% of infants born to mothers who have had a Zika virus infection during pregnancy have a birth defect
+What extra care does a newborn need if the mother is living with hepatitis B?,hepatitis-b-migrant-health-guide.txt,"receive appropriate care, including vaccinations at birth and at 4 weeks of age"
+How many people in the world are living with long-term hepatitis C and which region has the most?,hepatitis-c-migrant-health-guide.txt,estimates that 50 million people are living with chronic hepatitis C globally
 Does a new arrival need proof of address or immigration status to register with a GP and get vaccinated?,immunisation-migrant-health-guide.txt,"do not need to provide proof of identity, address or of immigration status"
 "If a child moved to the UK halfway through a vaccine course, do they have to start again?",immunisation-migrant-health-guide.txt,there is no need to repeat doses or restart the course
 Which animal spreads Lassa fever to people?,lassa-fever-origins-reservoirs-transmission-and-guidelines.txt,spread by wild rodents (Mastomys natalensis)
-How was Lassa virus first identified and why is it called that?,lassa-fever-origins-reservoirs-transmission-and-guidelines.txt,
-Which kind of rash should make me worry that someone has meningitis or blood poisoning?,meningococcal-disease-background-information.txt,
-Which age groups and health conditions make meningococcal disease more likely?,meningococcal-disease-background-information.txt,
+How was Lassa virus first identified and why is it called that?,lassa-fever-origins-reservoirs-transmission-and-guidelines.txt,the virus was identified in 1969 after 2 missionary nurses died from the disease in the Nigerian town of Lassa
+Which kind of rash should make me worry that someone has meningitis or blood poisoning?,meningococcal-disease-background-information.txt,"non-blanching rash, which means it does not fade when you press on it"
+Which age groups and health conditions make meningococcal disease more likely?,meningococcal-disease-background-information.txt,teenagers and young adults
 Which animal passes MERS to humans?,mers-cov-background-information.txt,transmitted from dromedary camels to humans
 Which country has reported the majority of MERS cases since 2012?,mers-cov-background-information.txt,Approximately 84% of human cases have been reported by the Kingdom of Saudi Arabia
-"How can measles, mumps or rubella be confirmed without taking a blood sample?",mmr-catchup-programme-diagnosis-case-management-and-advice.txt,
+"How can measles, mumps or rubella be confirmed without taking a blood sample?",mmr-catchup-programme-diagnosis-case-management-and-advice.txt,"oral fluid (saliva) samples can confirm the diagnosis of measles, mumps or rubella"
 Who is most at risk of catching measles at the moment?,mmr-catchup-programme-diagnosis-case-management-and-advice.txt,did not receive 2 doses of MMR vaccine as children are most at risk of catching measles now
 Which animals are the natural hosts of Nipah virus?,nipah-virus-epidemiology-outbreaks-and-guidance.txt,particularly fruit bats of the Pteropus genus
-Where and when was Nipah virus first recognised in people?,nipah-virus-epidemiology-outbreaks-and-guidance.txt,
-Which laboratories must report notifiable organisms and who do they report to?,notifiable-organisms-and-how-to-report-them.txt,
-What is the current name of the yeast that used to be called Candida auris?,notifiable-organisms-and-how-to-report-them.txt,
+Where and when was Nipah virus first recognised in people?,nipah-virus-epidemiology-outbreaks-and-guidance.txt,initially isolated and identified in 1999 during an outbreak of encephalitis and respiratory illness among pig farmers
+Which laboratories must report notifiable organisms and who do they report to?,notifiable-organisms-and-how-to-report-them.txt,All laboratories in England with a primary diagnostic role must report a confirmed notifiable organism to the UK Health Security Agency
+What is the current name of the yeast that used to be called Candida auris?,notifiable-organisms-and-how-to-report-them.txt,reclassified as Candidozyma auris following a taxonomic revision in 2023
 Which insects transmit Oropouche virus?,oropouche-virus-disease.txt,transmitted by certain species of midges (Culicoides paraensis) and mosquitoes
 Is there a vaccine or antiviral drug for Oropouche fever?,oropouche-virus-disease.txt,no specific vaccine or antiviral treatment
 What survey is the main source of data on infections among people who inject drugs?,people-who-inject-drugs-infection-risks-guidance-and-data.txt,The UAM Survey of PWID is the main source of information on the extent of infections and risks
@@ -38,15 +38,15 @@ Can whooping cough be diagnosed without a laboratory test?,pertussis-clinical-an
 What testing option exists for school-age children with suspected whooping cough?,pertussis-clinical-and-public-health-management.txt,oral fluid testing was made available for all children aged 5 to 16 years
 Which countries have the most human plague cases?,plague-epidemiology-outbreaks-and-guidance.txt,the Democratic Republic of Congo (DRC) and Madagascar considered to be the most highly endemic countries
 Can a pet cat pass plague to a person?,plague-epidemiology-outbreaks-and-guidance.txt,"exposure to infected cats (via fleas, scratches or bites)"
-Which patients should a clinician suspect of post-polio syndrome?,poliomyelitis-and-post-polio-syndrome-migrant-health-guide.txt,
+Which patients should a clinician suspect of post-polio syndrome?,poliomyelitis-and-post-polio-syndrome-migrant-health-guide.txt,showing unexplained signs of fatigue and weakness
 When did the UK last have a case of polio caught within the country?,poliomyelitis-and-post-polio-syndrome-migrant-health-guide.txt,the last case of domestically acquired polio infection was in 1984
 How many sick residents in a care home count as a respiratory outbreak that I need to report?,report-an-outbreak-of-acute-respiratory-infection-in-an-adult-social-care-settin.txt,2 or more people in your setting with symptoms that started within 5 days of each other
-Where was the SFTS virus first found and how does it spread?,severe-fever-with-thrombocytopaenia-syndrome-sfts-epidemiology-outbreaks-and-gui.txt,
+Where was the SFTS virus first found and how does it spread?,severe-fever-with-thrombocytopaenia-syndrome-sfts-epidemiology-outbreaks-and-gui.txt,was first isolated from human blood in 2009 in China
 At what temperature does cold weather start to count as a health risk for vulnerable patients?,supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt,prolonged periods below 2°C
-What are the colour levels of the cold-health alerts?,supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt,
+What are the colour levels of the cold-health alerts?,supporting-vulnerable-people-before-and-during-cold-weather-for-healthcare-profe.txt,"each Cold-Health Alert (CHA) type (yellow, amber or red)"
 Can you catch tick-borne encephalitis from unpasteurised milk products?,tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt,consumption of unpasteurised milk or dairy products from infected animals
 How long before a trip should someone visiting relatives abroad ask for travel health advice?,travel-to-visit-friends-and-relatives-migrant-health-guide.txt,at least 6 to 8 weeks prior to their planned departure
 "At what ages do children get the combined measles, mumps, rubella and chickenpox jab from 2026?",universal-varicella-vaccination-programme-in-england.txt,offered as a 2-dose schedule to children routinely at 12 months and 18 months of age
-A woman had a live vaccine before she knew she was pregnant. Who should the GP tell?,vaccination-in-pregnancy-vip.txt,
-Why is south-east England considered a place where invasive Aedes mosquitoes could survive?,national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt,
-"Has anyone caught West Nile virus in the UK, and has it been found in British mosquitoes?",national-contingency-plan-for-west-nile-virus-in-england.txt,
+A woman had a live vaccine before she knew she was pregnant. Who should the GP tell?,vaccination-in-pregnancy-vip.txt,"notify UKHSA, which runs UK-wide surveillance on the safety of vaccines given in pregnancy"
+Why is south-east England considered a place where invasive Aedes mosquitoes could survive?,national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt,Some areas of England are already considered suitable for survival of Aedes albopictus
+"Has anyone caught West Nile virus in the UK, and has it been found in British mosquitoes?",national-contingency-plan-for-west-nile-virus-in-england.txt,"no human cases of WNV acquired in the UK, but there have been detections of WNV in mosquitoes in the UK"

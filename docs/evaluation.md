@@ -1,6 +1,6 @@
 # Evaluation
 
-> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. Chunk sizes of 100, 150 and 400 words have been run at page level and at chunk level (21 questions). A second embedding model (bge-small-en-v1.5) has also been run at both levels.
+> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. Chunk sizes of 100, 150 and 400 words have been run at page level (51 questions) and at chunk level (the first 21 questions with a hand-written answer phrase; all 51 now have one, and the two embedding models were compared on all 51). A second embedding model (bge-small-en-v1.5) has also been run at both levels, and became the default on 2026-11-23 (reasons in `docs/architecture.md`). Every row below labelled "Baseline", "Smaller chunks" or "Larger chunks" was run with all-MiniLM-L6-v2, the earlier default.
 
 ## Goal
 
@@ -30,7 +30,7 @@ Run with `python -m ragdemo.evaluate` (add `--misses` to list questions that fai
 
 Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt` and `results/retrieval_chunk400.txt` (each header records the settings, chunk count and token lengths). Overlap was 20% of the chunk size in every run. The 100-, 150- and 400-word runs missed 0 of 51 questions at k=5, against 1 of 51 for the baseline. One question is about 0.02 of a score, so Hit@1 moving from 0.90 (46 questions) to 0.92 (47) and 0.94 (48) is a one- or two-question change and could be noise.
 
-Token lengths under the embedding model's tokenizer, which reads at most 256 tokens per input: 183 of 330 baseline chunks (55%) are over the limit, against 11 of 436 (3%) for 150 words and 0 of 651 for 100 words. The smaller chunks therefore avoid most truncation, but chunk size changed in other ways too (more, shorter chunks), so this does not prove truncation was the cause. Hit@k is page-level, so these runs say nothing yet about whether the chunk holding the answer is retrieved (the measles-risk question).
+Token lengths under MiniLM's tokenizer, which reads at most 256 tokens per input: 183 of 330 baseline chunks (55%) are over the limit, against 11 of 436 (3%) for 150 words and 0 of 651 for 100 words. The smaller chunks therefore avoid most truncation, but chunk size changed in other ways too (more, shorter chunks), so this does not prove truncation was the cause. Hit@k is page-level, so these runs say nothing yet about whether the chunk holding the answer is retrieved (the measles-risk question).
 
 The 400-word run is the opposite test: 158 of 169 chunks (93%) are over the 256-token limit (median 515 tokens, maximum 752), yet it scored 0.94, 0.98 and 1.00, as well as the best smaller setup. I expected a drop and did not get one, so page-level Hit@k does not show the cost of truncation. Hit@k is also not comparable across chunk sizes: the top 5 chunks cover about 2,000 words at 400 words per chunk, against about 500 at 100 words per chunk, which makes a page-level hit easier by itself.
 
@@ -38,7 +38,7 @@ The 400-word run is the opposite test: 158 of 169 chunks (93%) are over the 256-
 
 ## Chunk-level check
 
-**Metric:** Chunk-Hit@k, the share of questions where a chunk containing the answer is in the top k. Run with `python -m ragdemo.chunk_check`. For each question I copied a short phrase word for word from the answering sentence into `answer_text` in `eval/answer_spans.csv`; a chunk counts as answering if its text contains the phrase (case, quotes and line breaks ignored), so the same file works for any chunk size. 21 of the 51 questions are marked so far; the tool skips the rest. In every run all 21 phrases were found in at least one chunk.
+**Metric:** Chunk-Hit@k, the share of questions where a chunk containing the answer is in the top k. Run with `python -m ragdemo.chunk_check`. For each question I copied a short phrase word for word from the answering sentence into `answer_text` in `eval/answer_spans.csv`; a chunk counts as answering if its text contains the phrase (case, quotes and line breaks ignored), so the same file works for any chunk size. All 51 questions now have a phrase. The chunk-size runs below were made when only the first 21 did (the tool skips rows with no phrase), so they cover 21 questions; the all-51 runs are in the table after them. In every run every phrase was found in at least one chunk.
 
 | Setup | Chunk size (words) | Overlap | Chunks | Chunk-Hit@1 | Chunk-Hit@3 | Chunk-Hit@5 | Missed at k=5 |
 |-------|--------------------|---------|--------|-------------|-------------|-------------|---------------|
@@ -52,12 +52,23 @@ Raw output: `results/chunk_check_bge_small.txt` for the different-model row, and
 
 What the runs show:
 - One question is about 0.05, so the gap between 100 and 150 words at Hit@1 (0.43 against 0.57) is 3 questions. The pattern is more informative than any single number.
-- Larger chunks scored higher at every k, the opposite of the small-chunk lead at page level. The 400-word chunks were mostly over the embedding model's 256-token limit and still scored best, so truncation did not stop retrieval here. Why is not tested.
+- Larger chunks scored higher at every k, the opposite of the small-chunk lead at page level. The 400-word chunks were mostly over MiniLM's 256-token limit and still scored best, so truncation did not stop retrieval here. Why is not tested.
 - The measles-risk question (answering chunk is chunk 0 of the MMR catch-up page) was missed at every chunk size, and was the only miss at 400 words. This is the failure page-level Hit@k could not see.
 - The MMRV chickenpox question (a Hit@k miss in the baseline) was also a chunk-level miss in the baseline, but not at 100, 150 or 400 words. The other misses were: at 100 words, the cold-weather temperature and tick-borne encephalitis milk questions; at 150 words, the MERS countries and cold-weather temperature questions.
 - bge-small-en-v1.5 on the baseline chunks scored Chunk-Hit@1/3/5 of 0.62, 0.86 and 0.95. The measles-risk chunk was found, and the one miss was the tick-borne encephalitis milk question (right page, answering chunk 4 not in the top 5). Chunk-Hit@1 did not change; the gain is at k=3 and k=5 (one question each, so within noise on 21 questions).
 - This is still not a fully fair comparison between sizes: a longer chunk is a bigger target for the phrase, and the top 5 cover more text. The check also does not test what the LLM does with longer chunks.
-- The 21 questions are the ones I chose to mark, not a random sample.
+- The chunk-size runs cover only the first 21 questions I marked, which were not a random sample.
+
+**All 51 questions, both models** (200-word chunks, overlap 40; `results/chunk_check_all51_minilm.txt`, `results/chunk_check_all51_bge.txt`):
+
+| Embedding model | Chunk-Hit@1 | Chunk-Hit@3 | Chunk-Hit@5 | Missed at k=5 |
+|-----------------|-------------|-------------|-------------|---------------|
+| all-MiniLM-L6-v2 | 0.69 (35) | 0.88 (45) | 0.92 (47) | 4 |
+| bge-small-en-v1.5 | 0.65 (33) | 0.90 (46) | 0.96 (49) | 2 |
+
+- The counts in brackets are questions out of 51. MiniLM is ahead at k=1 by 2 questions; bge is ahead at k=3 by 1 and at k=5 by 2. The result is mixed and within a couple of questions, so it does not show that either model is better at chunk level.
+- MiniLM missed at k=5: the diphtheria "wait for lab confirmation" question, the measles-risk question, the MMRV chickenpox question and the invasive Aedes south-east England question. bge missed: the diphtheria question and the tick-borne encephalitis milk question. The diphtheria question (answering chunk 0) is missed by both.
+- The earlier statement that bge was equal or better on every chunk-level measure came from the first 21 questions and does not hold on all 51: MiniLM is ahead at Chunk-Hit@1.
 
 ## Answer quality
 
@@ -105,4 +116,4 @@ Retrieval found the right page within the top 5 for 50 of 51 questions (Hit@1 0.
 
 In the manual spot check, both LLMs stayed within the sources and refused most out-of-scope questions cleanly. The one exception was the COVID booster boundary question, where Ollama blended flu and COVID guidance (the OpenRouter call for that question failed). Ollama (`qwen2.5:7b`) was concise and completed all 12 questions but answered the measles question confidently and wrongly. The OpenRouter free model was more careful but less reliable (one empty answer, two cut-off answers). With only 12 questions per model and one reviewer, these are observations, not measured accuracy.
 
-Chunk sizes of 100, 150 and 400 words all matched or slightly beat the baseline at every k and found the baseline's one miss, but the gains are one or two questions out of 51, and the heavily truncated 400-word chunks scored as well as the best smaller setup. Page-level Hit@k therefore does not separate these setups. Changing the embedding model helped more than changing chunk size at page level: bge-small-en-v1.5 scored Hit@1/3/5 of 0.98, 1.00 and 1.00, with no misses. A chunk-level check on 21 hand-marked questions did separate them (see above): Chunk-Hit@5 rose with chunk size, from 0.86 at 100 and 150 words to 0.95 at 400, and the measles-risk chunk was missed at every size. Next steps: mark the remaining 30 questions in `eval/answer_spans.csv`, then test overlap, bge's query prefix, and bge with other chunk sizes using the chunk-level check.
+Chunk sizes of 100, 150 and 400 words all matched or slightly beat the baseline at every k and found the baseline's one miss, but the gains are one or two questions out of 51, and the heavily truncated 400-word chunks scored as well as the best smaller setup. Page-level Hit@k therefore does not separate these setups. Changing the embedding model helped more than changing chunk size at page level: bge-small-en-v1.5 scored Hit@1/3/5 of 0.98, 1.00 and 1.00, with no misses. A chunk-level check on 21 hand-marked questions did separate them (see above): Chunk-Hit@5 rose with chunk size, from 0.86 at 100 and 150 words to 0.95 at 400, and the measles-risk chunk was missed at every size. With phrases for all 51 questions, the two embedding models were compared at chunk level: bge was behind by 2 questions at k=1 and ahead by 1 at k=3 and 2 at k=5, a mixed result within noise. Next steps: re-run the chunk-size experiments at chunk level on all 51 questions (and with bge), then test overlap and bge's query prefix.

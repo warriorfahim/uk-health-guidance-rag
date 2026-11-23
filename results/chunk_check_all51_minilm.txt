@@ -1,0 +1,24 @@
+# Chunk-level retrieval check on all 51 questions, all-MiniLM-L6-v2, 200-word chunks, run on 2026-11-23
+# command: python -m ragdemo.chunk_check --model sentence-transformers/all-MiniLM-L6-v2 --index data/index_minilm.faiss
+# chunk size=200 words, overlap=40, model=all-MiniLM-L6-v2, 330 chunks, 32 pages, 51 of 51 questions have a hand-written answer_text
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: sentence-transformers/all-MiniLM-L6-v2, index: data/index_minilm.faiss
+Checked 51 questions; answer phrase not found in any chunk for 0
+Chunk-Hit@1: 0.69
+Chunk-Hit@3: 0.88
+Chunk-Hit@5: 0.92
+
+Answering chunk not in the top 5: 4 of 51
+- Do I have to wait for lab confirmation before alerting health protection about a suspected diphtheria case?
+    answering chunk(s): diphtheria-migrant-health-guide.txt#0
+    got: diphtheria-migrant-health-guide.txt#3, diphtheria-migrant-health-guide.txt#4, diphtheria-migrant-health-guide.txt#6, diphtheria-migrant-health-guide.txt#5, diphtheria-migrant-health-guide.txt#1
+- Who is most at risk of catching measles at the moment?
+    answering chunk(s): mmr-catchup-programme-diagnosis-case-management-and-advice.txt#0
+    got: mmr-catchup-programme-diagnosis-case-management-and-advice.txt#2, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#5, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#6, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#7, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#4
+- At what ages do children get the combined measles, mumps, rubella and chickenpox jab from 2026?
+    answering chunk(s): universal-varicella-vaccination-programme-in-england.txt#0
+    got: mmr-catchup-programme-diagnosis-case-management-and-advice.txt#3, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#4, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#6, pertussis-clinical-and-public-health-management.txt#2, mmr-catchup-programme-diagnosis-case-management-and-advice.txt#5
+- Why is south-east England considered a place where invasive Aedes mosquitoes could survive?
+    answering chunk(s): national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#12, #13
+    got: national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#0, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#14, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#68, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#4, national-contingency-plan-for-invasive-aedes-mosquitoes-in-england.txt#2
