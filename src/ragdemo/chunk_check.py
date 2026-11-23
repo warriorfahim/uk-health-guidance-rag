@@ -5,9 +5,10 @@ word for word from the page that contains the answer, written by hand in
 eval/answer_spans.csv (columns: question, expected_source, answer_text). A chunk counts as the
 answering chunk if its text contains that phrase, so the same file works for any chunk size.
 
-    python -m ragdemo.chunk_check
+    python -m ragdemo.chunk_check [--model NAME --index PATH]
 
 Run it against whichever index is currently built (ingest + index first when changing chunking).
+Use --model and --index together when the index was built with a different embedding model.
 Rows with an empty answer_text are skipped.
 """
 import csv
@@ -53,7 +54,8 @@ def read_spans(path: str) -> list[dict]:
         return list(csv.DictReader(f))
 
 
-def main(spans_path: str = "eval/answer_spans.csv", ks=(1, 3, 5)) -> None:
+def main(spans_path: str = "eval/answer_spans.csv", ks=(1, 3, 5),
+         model_name: str | None = None, index_path: str = "data/index.faiss") -> None:
     rows = read_spans(spans_path)
     filled = [r for r in rows if (r.get("answer_text") or "").strip()]
     print(f"{len(filled)} of {len(rows)} questions have an answer_text in {spans_path}")
@@ -61,9 +63,12 @@ def main(spans_path: str = "eval/answer_spans.csv", ks=(1, 3, 5)) -> None:
         print("Nothing to check. Add a short verbatim phrase from the answering sentence to answer_text.")
         return
 
+    from .index import DEFAULT_MODEL
     from .retrieve import Retriever
 
-    retriever = Retriever()
+    model_name = model_name or DEFAULT_MODEL
+    print(f"Model: {model_name}, index: {index_path}")
+    retriever = Retriever(index_path=index_path, model_name=model_name)
     ranks, not_found, details = [], [], []
     for row in filled:
         question, source, phrase = row["question"], row["expected_source"], row["answer_text"]
@@ -94,4 +99,11 @@ def main(spans_path: str = "eval/answer_spans.csv", ks=(1, 3, 5)) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    from .index import add_model_args
+
+    parser = argparse.ArgumentParser(description="Chunk-level hit rate (is the answering chunk in the top k?).")
+    add_model_args(parser)
+    args = parser.parse_args()
+    main(model_name=args.model, index_path=args.index)

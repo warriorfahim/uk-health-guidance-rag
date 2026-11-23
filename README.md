@@ -105,7 +105,13 @@ Same embedding model and 20% overlap throughout. One question is about 0.05 here
 
 Page-level Hit@k is on 51 questions, Chunk-Hit@k on the 21 hand-marked ones. bge missed no question at k=5 at page level, and the measles-risk chunk was found in its top 5 (it was not in MiniLM's top 5). Its one chunk-level miss was the tick-borne encephalitis milk question. The models differ in training and architecture as well as input length, so this does not show that truncation caused the baseline's misses.
 
-The app and the Quick start still use `all-MiniLM-L6-v2`, set as the default in `ragdemo.index`. The bge numbers came from running `ragdemo.index.main(model_name="BAAI/bge-small-en-v1.5", index_path="data/index_bge.faiss")` and then pointing `Retriever` at that index and model with a short script. `evaluate` and `chunk_check` have no model option yet, so repeating the bge rows needs that small change (not yet implemented).
+The app and the Quick start still use `all-MiniLM-L6-v2`, set as the default in `ragdemo.index`. To repeat the bge rows (same chunks, separate index file so the baseline index is untouched):
+```bash
+python -m ragdemo.index --model BAAI/bge-small-en-v1.5 --index data/index_bge.faiss
+python -m ragdemo.evaluate --model BAAI/bge-small-en-v1.5 --index data/index_bge.faiss
+python -m ragdemo.chunk_check --model BAAI/bge-small-en-v1.5 --index data/index_bge.faiss
+```
+The original bge runs were made with a short script before these options existed; re-running with the options gave the same numbers. The `--model` and `--index` options are for these three commands only. The app and `answer_check` still use the default model and index.
 
 ## What I learned
 - **Retrieval found the right page.** The baseline scored Hit@5 0.98 on 51 questions, and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts. The local model blended flu and COVID guidance on one boundary question.
@@ -117,9 +123,7 @@ The app and the Quick start still use `all-MiniLM-L6-v2`, set as the default in 
 ## Limitations
 - Answers are only as good as the retrieved passages. The model is told to say when the sources do not contain the answer.
 - Answer quality was judged by one person on 12 questions per model, with no scoring metric, so treat it as a spot check and not a benchmark.
-- Only one other embedding model was tried (bge-small-en-v1.5), once, without its query prefix. Hit@k is page-level, and the chunk-level check covers only 21 of the 51 questions. I chose which 21 to mark, so they are not a random sample.
-- The bge rows were produced with a short script and cannot be repeated from the command line yet (see the note under the embedding-model table).
-- The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
+- Only one other embedding model was tried (bge-small-en-v1.5), once, without its query prefix. Hit@k is page-level, and the chunk-level check covers only 21 of the 51 questions. I chose which 21 to mark, so they are not a random sample.- The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
 - This is a demo built on public data. It is not medical advice.
 
 ## How this was built

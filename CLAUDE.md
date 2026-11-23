@@ -27,11 +27,12 @@ python -m ragdemo.index      # data/chunks.jsonl -> data/index.faiss
 python -m ragdemo.evaluate   # prints Hit@1/3/5 using eval/eval_questions.csv
 python -m ragdemo.evaluate --misses   # also lists questions whose source was not in the top 5
 python -m ragdemo.chunk_check   # chunk-level hit rate: is the chunk holding the answer in the top k? uses eval/answer_spans.csv
+# index, evaluate and chunk_check accept --model NAME --index PATH to use another embedding model and index file
 python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs questions through the LLM for manual marking
 streamlit run app.py
 ```
 
-Only a few modules take command-line arguments: `evaluate` accepts a single `--misses` flag (read from `sys.argv`), `answer_check` uses argparse (`--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--delay`), and `fetch` uses argparse subcommands. `ingest`, `index` and `retrieve` take none. Settings (chunk `size=200`, `overlap=40`, model, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
+Only a few modules take command-line arguments: `index`, `evaluate` and `chunk_check` use argparse with `--model` and `--index` (shared via `index.add_model_args`; `evaluate` also takes `--misses`), `answer_check` uses argparse (`--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--delay`) and always uses the default model and index, and `fetch` uses argparse subcommands. `ingest` and `retrieve` take none. Other settings (chunk `size=200`, `overlap=40`, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
 
 ## Architecture and invariants
 

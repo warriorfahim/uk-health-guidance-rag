@@ -23,11 +23,27 @@ def find_misses(
     ]
 
 
+def parse_args(argv: list[str] | None = None):
+    import argparse
+
+    from .index import add_model_args
+
+    parser = argparse.ArgumentParser(description="Hit@k on the retrieval eval set.")
+    parser.add_argument("--misses", action="store_true",
+                        help="also list questions whose source was not in the top 5")
+    add_model_args(parser)
+    return parser.parse_args(argv)
+
+
 def main(
-    eval_path: str = "eval/eval_questions.csv", ks=(1, 3, 5), show_misses: bool = False
+    eval_path: str = "eval/eval_questions.csv", ks=(1, 3, 5), show_misses: bool = False,
+    model_name: str | None = None, index_path: str = "data/index.faiss",
 ) -> None:
+    from .index import DEFAULT_MODEL
     from .retrieve import Retriever
-    retriever = Retriever()
+    model_name = model_name or DEFAULT_MODEL
+    print(f"Model: {model_name}, index: {index_path}")
+    retriever = Retriever(index_path=index_path, model_name=model_name)
     questions, expected = [], []
     with open(eval_path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -45,6 +61,5 @@ def main(
 
 
 if __name__ == "__main__":
-    import sys
-
-    main(show_misses="--misses" in sys.argv[1:])
+    args = parse_args()
+    main(show_misses=args.misses, model_name=args.model, index_path=args.index)

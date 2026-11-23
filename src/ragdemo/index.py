@@ -4,6 +4,14 @@ import json
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 
+def add_model_args(parser) -> None:
+    """Add --model and --index options (shared by index, evaluate and chunk_check)."""
+    parser.add_argument("--model", default=DEFAULT_MODEL,
+                        help=f"embedding model name (default: {DEFAULT_MODEL})")
+    parser.add_argument("--index", default="data/index.faiss",
+                        help="FAISS index file to write or read (default: data/index.faiss)")
+
+
 def load_chunks(path: str = "data/chunks.jsonl") -> list[dict]:
     with open(path, encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
@@ -27,4 +35,9 @@ def main(chunks_path: str = "data/chunks.jsonl", index_path: str = "data/index.f
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Embed data/chunks.jsonl and build a FAISS index.")
+    add_model_args(parser)
+    args = parser.parse_args()
+    main(index_path=args.index, model_name=args.model)
