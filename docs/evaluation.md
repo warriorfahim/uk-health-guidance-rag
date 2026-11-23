@@ -1,6 +1,6 @@
 # Evaluation
 
-> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. Chunk sizes of 100, 150 and 400 words have been run at page level (51 questions) and at chunk level (first on the 21 questions that had a hand-written answer phrase, then repeated on all 51 with both embedding models). A second embedding model (bge-small-en-v1.5) has also been run at both levels, and became the default on 2026-11-23 (reasons in `docs/architecture.md`). Every row below labelled "Baseline", "Smaller chunks" or "Larger chunks" was run with all-MiniLM-L6-v2, the earlier default.
+> Status: baseline retrieval run and a manual answer spot check (Ollama and OpenRouter) are done. Chunk sizes of 100, 150 and 400 words have been run at page level (51 questions) and at chunk level (first on the 21 questions that had a hand-written answer phrase, then repeated on all 51 with both embedding models). A second embedding model (bge-small-en-v1.5) has also been run at both levels, and became the default on 2026-11-23 (reasons in `docs/architecture.md`). Rows below labelled "Baseline", "Smaller chunks" or "Larger chunks" were run with all-MiniLM-L6-v2, the earlier default; rows labelled "Different model" were run with bge-small-en-v1.5.
 
 ## Goal
 
@@ -27,8 +27,11 @@ Run with `python -m ragdemo.evaluate` (add `--misses` to list questions that fai
 | Smaller chunks | 150 | 30 | all-MiniLM-L6-v2 | 0.94 | 0.98 | 1.00 |
 | Larger chunks | 400 | 80 | all-MiniLM-L6-v2 | 0.94 | 0.98 | 1.00 |
 | Different model | 200 | 40 | bge-small-en-v1.5 | 0.98 | 1.00 | 1.00 |
+| Different model, smaller chunks | 100 | 20 | bge-small-en-v1.5 | 0.98 | 0.98 | 1.00 |
+| Different model, smaller chunks | 150 | 30 | bge-small-en-v1.5 | 0.98 | 1.00 | 1.00 |
+| Different model, larger chunks | 400 | 80 | bge-small-en-v1.5 | 1.00 | 1.00 | 1.00 |
 
-Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt` and `results/retrieval_chunk400.txt` (each header records the settings, chunk count and token lengths). Overlap was 20% of the chunk size in every run. The 100-, 150- and 400-word runs missed 0 of 51 questions at k=5, against 1 of 51 for the baseline. One question is about 0.02 of a score, so Hit@1 moving from 0.90 (46 questions) to 0.92 (47) and 0.94 (48) is a one- or two-question change and could be noise.
+Raw output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt` and `results/retrieval_chunk400.txt` (MiniLM), and `results/retrieval_bge_small.txt`, `results/retrieval_chunk100_bge.txt`, `results/retrieval_chunk150_bge.txt` and `results/retrieval_chunk400_bge.txt` (bge) (each header records the settings, chunk count and token lengths). Overlap was 20% of the chunk size in every run. The 100-, 150- and 400-word runs missed 0 of 51 questions at k=5, against 1 of 51 for the baseline. One question is about 0.02 of a score, so Hit@1 moving from 0.90 (46 questions) to 0.92 (47) and 0.94 (48) is a one- or two-question change and could be noise.
 
 Token lengths under MiniLM's tokenizer, which reads at most 256 tokens per input: 183 of 330 baseline chunks (55%) are over the limit, against 11 of 436 (3%) for 150 words and 0 of 651 for 100 words. The smaller chunks therefore avoid most truncation, but chunk size changed in other ways too (more, shorter chunks), so this does not prove truncation was the cause. Hit@k is page-level, so these runs say nothing yet about whether the chunk holding the answer is retrieved (the measles-risk question).
 
@@ -38,7 +41,7 @@ The 400-word run is the opposite test: 158 of 169 chunks (93%) are over the 256-
 
 ## Chunk-level check
 
-**Metric:** Chunk-Hit@k, the share of questions where a chunk containing the answer is in the top k. Run with `python -m ragdemo.chunk_check`. For each question I copied a short phrase word for word from the answering sentence into `answer_text` in `eval/answer_spans.csv`; a chunk counts as answering if its text contains the phrase (case, quotes and line breaks ignored), so the same file works for any chunk size. All 51 questions now have a phrase. The chunk-size runs below were made when only the first 21 did (the tool skips rows with no phrase), so they cover 21 questions; the all-51 runs are in the table after them. In every run every phrase was found in at least one chunk.
+**Metric:** Chunk-Hit@k, the share of questions where a chunk containing the answer is in the top k. Run with `python -m ragdemo.chunk_check`. For each question I copied a short phrase word for word from the answering sentence into `answer_text` in `eval/answer_spans.csv` (I wrote all 51 myself; Claude produced candidate phrases for 30 of them as a suggestion, which I did not use); a chunk counts as answering if its text contains the phrase (case, quotes and line breaks ignored), so the same file works for any chunk size. All 51 questions now have a phrase. The chunk-size runs below were made when only the first 21 did (the tool skips rows with no phrase), so they cover 21 questions; the all-51 runs are in the table after them. In every run every phrase was found in at least one chunk.
 
 | Setup | Chunk size (words) | Overlap | Chunks | Chunk-Hit@1 | Chunk-Hit@3 | Chunk-Hit@5 | Missed at k=5 |
 |-------|--------------------|---------|--------|-------------|-------------|-------------|---------------|

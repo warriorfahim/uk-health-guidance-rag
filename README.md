@@ -21,7 +21,7 @@ app.py         Streamlit interface
 tests/         unit tests (run in CI, no model downloads needed)
 data/raw/      cleaned .txt guidance pages (not committed; `fetch` can create these)
 eval/          eval_questions.csv (question, expected_source), out_of_scope_questions.csv (question, note) and answer_spans.csv (hand-written answer phrases for the chunk-level check)
-results/       saved output of real runs: page-level retrieval (baseline, chunk sizes, bge), chunk-level checks, token-length check and answer-check reports
+results/       saved output of real runs: page-level retrieval (baseline, chunk sizes, bge), chunk-level checks, token-length check, embedding timing and answer-check reports
 docs/          architecture.md and evaluation.md
 .github/       CI workflow (tests and lint on every push)
 ```
@@ -73,7 +73,7 @@ The app's sidebar has an "LLM backend" selector, so you can switch between Ollam
 If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without its key), the app automatically falls back to showing the grounded prompt instead of an answer; `LLM_BACKEND=none` forces this. If a call to a working backend fails, the app shows the error. Retrieved sources are always listed. Retrieval evaluation (`ragdemo.evaluate`) does not use the LLM. Answer quality was checked by hand on a small sample (see `docs/evaluation.md`).
 
 ## Evaluation
-`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw page-level output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt`, `results/retrieval_chunk400.txt` and `results/retrieval_bge_small.txt`. Answers from two LLMs were also spot-checked by hand on 12 questions each, and the local model was re-run with bge-retrieved chunks (`results/answer_check_ollama_bge.md`); see `docs/evaluation.md`.
+`eval/eval_questions.csv` holds 51 hand-written questions, each with the expected source file (all 32 pages have at least one). Raw page-level output: `results/retrieval_baseline.txt`, `results/retrieval_chunk100.txt`, `results/retrieval_chunk150.txt`, `results/retrieval_chunk400.txt` (all MiniLM), and `results/retrieval_bge_small.txt`, `results/retrieval_chunk100_bge.txt`, `results/retrieval_chunk150_bge.txt` and `results/retrieval_chunk400_bge.txt` (bge). Answers from two LLMs were also spot-checked by hand on 12 questions each, and the local model was re-run with bge-retrieved chunks (`results/answer_check_ollama_bge.md`); see `docs/evaluation.md`.
 
 | Setup | Chunk size (words) | Embedding model | Hit@1 | Hit@3 | Hit@5 |
 |-------|--------------------|-----------------|-------|-------|-------|
@@ -86,9 +86,9 @@ If no LLM is usable (Ollama not running, or `hf`/`openrouter` selected without i
 | Different model, smaller chunks | 150 | bge-small-en-v1.5 | 0.98 | 1.00 | 1.00 |
 | Different model, larger chunks | 400 | bge-small-en-v1.5 | 1.00 | 1.00 | 1.00 |
 
-Overlap was 20% of the chunk size in every run (40, 20, 30 and 80 words). With 51 questions, one question is about 0.02, so the gains over the baseline are one or two questions and could be noise. The baseline's 200-word chunks are often longer than the embedding model's 256-token input limit (55% of them); the 100- and 150-word chunks almost all fit. The 400-word chunks are mostly cut off by that limit (93% are over it) yet scored as well as the best smaller setup, so page-level Hit@k does not show the cost of truncation, and it is not comparable across chunk sizes because the top 5 cover more text when chunks are larger. See `docs/evaluation.md`.
+Overlap was 20% of the chunk size in every run (40, 20, 30 and 80 words). With 51 questions, one question is about 0.02, so the MiniLM chunk-size gains over the baseline are one or two questions and could be noise (bge's Hit@1 gain over MiniLM at 200 words is 4 questions). The baseline's 200-word chunks are often longer than MiniLM's 256-token input limit (55% of them); the 100- and 150-word chunks almost all fit. The 400-word chunks are mostly cut off by that limit (93% are over it) yet scored as well as the best smaller MiniLM setup, so page-level Hit@k does not show the cost of truncation, and it is not comparable across chunk sizes because the top 5 cover more text when chunks are larger. See `docs/evaluation.md`.
 
-**Chunk-level check.** `python -m ragdemo.chunk_check` asks a stricter question: is the chunk that contains the answer in the top k? It uses a short phrase copied by hand from the answering sentence for each question (`eval/answer_spans.csv`). The chunk-size runs below were made when only the first 21 questions had a phrase, so they cover 21 questions; later runs cover all 51. Raw output for the 21-question runs: `results/chunk_check_baseline.txt`, `results/chunk_check_chunk100.txt`, `results/chunk_check_chunk150.txt` and `results/chunk_check_chunk400.txt`.
+**Chunk-level check.** `python -m ragdemo.chunk_check` asks a stricter question: is the chunk that contains the answer in the top k? It uses a short phrase copied by hand from the answering sentence for each question (`eval/answer_spans.csv`). The chunk-size runs in the next table (all-MiniLM-L6-v2) were made when only the first 21 questions had a phrase, so they cover 21 questions; later runs cover all 51. Raw output for the 21-question runs: `results/chunk_check_baseline.txt`, `results/chunk_check_chunk100.txt`, `results/chunk_check_chunk150.txt` and `results/chunk_check_chunk400.txt`.
 
 | Chunk size (words) | Chunks | Chunk-Hit@1 | Chunk-Hit@3 | Chunk-Hit@5 |
 |--------------------|--------|-------------|-------------|-------------|
@@ -128,7 +128,7 @@ Once all 51 questions had a phrase (`results/chunk_check_all51_bge.txt`, `result
 
 MiniLM was ahead at k=1 by 2 questions, and bge was ahead at k=3 and k=5 by 1 and 2 questions. MiniLM missed the diphtheria "wait for lab confirmation" question, the measles-risk question, the MMRV chickenpox question and the invasive Aedes south-east England question. bge missed the diphtheria question and the tick-borne encephalitis milk question. These gaps are one or two questions, so they are within noise, and the models differ in training and architecture as well as input length, so this does not show that truncation caused MiniLM's misses.
 
-**Default model.** On 2026-11-23 the default became `BAAI/bge-small-en-v1.5` (`ragdemo.index.DEFAULT_MODEL`), so the Quick start, the app and `answer_check` now use it. The reasons: at page level it was ahead, mainly at k=1 (Hit@1 0.98 against 0.90, 4 questions; 1 question at k=3 and k=5), at chunk level on all 51 questions it was mixed (behind by 2 questions at k=1, ahead by 1 at k=3, which is the k the app uses, and by 2 at k=5), it answered 6 of 6 main-set questions correctly in the 12-question answer check against 4 of 6, and it reads 512 tokens, so none of the 200-word chunks are cut off. The costs: indexing the 330 chunks took about 98 s against 36 s, and embedding a question about 44 ms against 26 ms (`results/embedding_timing.txt`, CPU, rough). The evidence is thin and not uniformly in bge's favour (the gaps are one to four questions, one answer-check run, no query prefix), so this is a judgement that the demo can reverse cheaply, not a proven result. The 100-, 150- and 400-word runs above were all made with MiniLM and have not been repeated with bge.
+**Default model.** On 2026-11-23 the default became `BAAI/bge-small-en-v1.5` (`ragdemo.index.DEFAULT_MODEL`), so the Quick start, the app and `answer_check` now use it. The reasons: at page level it was ahead, mainly at k=1 (Hit@1 0.98 against 0.90, 4 questions; 1 question at k=3 and k=5), at chunk level on all 51 questions it was mixed (behind by 2 questions at k=1, ahead by 1 at k=3, which is the k the app uses, and by 2 at k=5), it answered 6 of 6 main-set questions correctly in the 12-question answer check against 4 of 6, and it reads 512 tokens, so none of the 200-word chunks are cut off. The costs: indexing the 330 chunks took about 98 s against 36 s, and embedding a question about 44 ms against 26 ms (`results/embedding_timing.txt`, CPU, rough). The evidence is thin and not uniformly in bge's favour (the gaps are one to four questions, one answer-check run, no query prefix), so this is a judgement that the demo can reverse cheaply, not a proven result. The chunk size stays at 200 words; the 100-, 150- and 400-word runs were repeated with bge (see the all-51 table above), but the LLM has not been tried with other chunk sizes.
 
 If you change the default model you must rebuild `data/index.faiss` (`python -m ragdemo.index`); both models give 384-dimensional vectors, so a mismatch would not raise an error.
 
@@ -150,7 +150,7 @@ The bge rows were first produced with a short script before these options existe
 ## Limitations
 - Answers are only as good as the retrieved passages. The model is told to say when the sources do not contain the answer.
 - Answer quality was judged by one person on 12 questions per model, with no scoring metric, so treat it as a spot check and not a benchmark.
-- Only one other embedding model was tried (bge-small-en-v1.5), once, without its query prefix. Hit@k is page-level, and the larger-chunk advantage at chunk level is partly an easier target and untested with the LLM.
+- Only one other embedding model was tried (bge-small-en-v1.5), without its query prefix. Hit@k is page-level, and the larger-chunk advantage at chunk level is partly an easier target and untested with the LLM.
 - The OpenRouter run used a free preview model with a 400-token cap, and an earlier run of it hit rate limits (HTTP 429).
 - This is a demo built on public data. It is not medical advice.
 
@@ -158,6 +158,7 @@ The bge rows were first produced with a short script before these options existe
 I built this project with Claude Code (Anthropic's AI coding assistant) helping with implementation: much of the code, the tests and the first drafts of the docs were written with it, and I reviewed the changes and ran everything myself. The parts that need human judgement were done by me:
 - **The evaluation set.** I wrote `eval/eval_questions.csv` (51 questions) and `eval/out_of_scope_questions.csv` by hand, so they stay independent of the system being tested.
 - **The answer-quality check.** I read every answer from the two LLMs and marked it by hand against the source pages (see `docs/evaluation.md`). I did the same for the later run with bge-retrieved chunks.
+- **The chunk-level answer phrases.** I wrote all 51 phrases in `eval/answer_spans.csv` myself, by copying a short phrase from the answering sentence on each page. Claude produced a set of candidate phrases for 30 of the questions as a suggestion, but I did not use them.
 - **The results.** Every number in this README comes from a real run saved in `results/`. Nothing is estimated.
 
 ## Data
