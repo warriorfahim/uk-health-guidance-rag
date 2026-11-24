@@ -66,7 +66,23 @@ def run_question(question: str, retriever, generate) -> tuple[str, list[dict]]:
         return f"ERROR from LLM: {exc}", hits
 
 
-def format_entry(number: int, kind: str, row: dict, reply: str, hits: list[dict]) -> str:
+def format_info(info: dict) -> list[str]:
+    """Report lines for the finish reason and token usage, if the backend recorded them."""
+    lines = []
+    if info.get("finish_reason"):
+        lines.append(f"- Finish reason: {info['finish_reason']}")
+    usage = info.get("usage") or {}
+    reasoning = (usage.get("completion_tokens_details") or {}).get("reasoning_tokens")
+    counts = [("prompt", usage.get("prompt_tokens")), ("completion", usage.get("completion_tokens")),
+              ("reasoning", reasoning)]
+    shown = ", ".join(f"{name} {n}" for name, n in counts if n is not None)
+    if shown:
+        lines.append(f"- Tokens: {shown}")
+    return lines
+
+
+def format_entry(number: int, kind: str, row: dict, reply: str, hits: list[dict],
+                 info: dict | None = None) -> str:
     lines = [f"### {number}. {row['question']}", "", f"- Type: {kind}"]
     if kind == "in-scope":
         expected = row["expected_source"]
@@ -74,7 +90,8 @@ def format_entry(number: int, kind: str, row: dict, reply: str, hits: list[dict]
         lines.append(f"- Expected source: `{expected}` (retrieved in top {K}: {'yes' if found else 'NO'})")
     else:
         lines.append(f"- Note: {row.get('note', '')}")
-    lines += ["- Retrieved: " + ", ".join(f"[{i}] `{h['source']}`" for i, h in enumerate(hits, 1)), ""]
+    lines.append("- Retrieved: " + ", ".join(f"[{i}] `{h['source']}`" for i, h in enumerate(hits, 1)))
+    lines += format_info(info or {}) + [""]
     lines += ["**Answer:**", "", reply, ""]
     if kind == "in-scope":
         lines += ["- Correct? (yes/no/partly):", "- Grounded in the sources? (yes/no):",
@@ -96,6 +113,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--chunks", default="data/chunks.jsonl",
                         help="chunks file the index was built from (default: data/chunks.jsonl)")
     add_model_args(parser)
+    parser.add_argument("--max-tokens", type=int, default=400,
+                        help="cap on each reply's length in tokens (default: 400)")
     parser.add_argument("--delay", type=float, default=0.0,
                         help="seconds to pause between questions (helps with rate limits)")
     return parser.parse_args(argv)
@@ -108,7 +127,7 @@ def main(argv: list[str] | None = None) -> None:
     from .retrieve import Retriever
 
     retriever = Retriever(chunks_path=args.chunks, index_path=args.index, model_name=args.model)
-    generate = make_generate()
+    generate = make_generate(max_tokens=args.max_tokens)
     items = [("in-scope", r) for r in sample_rows(read_rows(args.eval), args.sample, args.seed)]
     items += [("out-of-scope", r) for r in read_rows(args.out_of_scope)]
 
@@ -116,16 +135,17 @@ def main(argv: list[str] | None = None) -> None:
     for number, (kind, row) in enumerate(items, start=1):
         print(f"[{number}/{len(items)}] {row['question']}")
         reply, hits = run_question(row["question"], retriever, generate)
-        entries.append(format_entry(number, kind, row, reply, hits))
+        info = getattr(generate, "last_info", None)
+        entries.append(format_entry(number, kind, row, reply, hits, info))
         if args.delay and number < len(items):
             time.sleep(args.delay)
 
     header = (
         f"# Answer check, run on {date.today().isoformat()}\n\n"
         f"Top {K} chunks per question. Backend: {describe_backend()}. "
-        f"Sample seed: {args.seed}. Replies are capped at 400 tokens, so long answers may be "
-        f"cut off. If an answer starts with 'No LLM available', the backend was not running "
-        f"and this is only the grounded prompt.\n\n"
+        f"Sample seed: {args.seed}. Replies are capped at {args.max_tokens} tokens, "
+        f"so long answers may be cut off. If an answer starts with 'No LLM available', "
+        f"the backend was not running and this is only the grounded prompt.\n\n"
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

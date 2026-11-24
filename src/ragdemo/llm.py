@@ -103,6 +103,9 @@ def make_openrouter_generate(
     A rate-limited call (HTTP 429) is retried up to `retries` times. Each wait is the server's
     Retry-After header if it sends one, otherwise `retry_wait` seconds times the attempt number,
     and never more than 60 seconds.
+
+    After each call, `generate.last_info` holds the reply's `finish_reason` and token `usage` as
+    OpenRouter reported them (empty if the request itself failed).
     """
     api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
@@ -110,6 +113,7 @@ def make_openrouter_generate(
     model = model or os.environ.get("OPENROUTER_MODEL") or OPENROUTER_DEFAULT_MODEL
 
     def generate(prompt: str) -> str:
+        generate.last_info = {}
         body = json.dumps({
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
@@ -132,11 +136,14 @@ def make_openrouter_generate(
                     continue
                 hint = " (rate limited; try again shortly)" if exc.code == 429 else ""
                 raise RuntimeError(f"OpenRouter returned HTTP {exc.code}{hint}") from exc
-        content = (data.get("choices") or [{}])[0].get("message", {}).get("content")
+        choice = (data.get("choices") or [{}])[0]
+        generate.last_info = {"finish_reason": choice.get("finish_reason"), "usage": data.get("usage")}
+        content = choice.get("message", {}).get("content")
         if not content:
             raise RuntimeError("OpenRouter returned an empty answer")
         return content.strip()
 
+    generate.last_info = {}
     return generate
 
 
@@ -159,12 +166,13 @@ def ollama_available(base_url: str | None = None, timeout: float = 1.0) -> bool:
         return False
 
 
-def make_generate(backend: str | None = None):
+def make_generate(backend: str | None = None, max_tokens: int = 400):
     """Pick a backend: the argument, else LLM_BACKEND, else "ollama".
 
     Choices are "ollama", "openrouter", "hf" or "none". Falls back to `make_echo_generate` (shows
     the grounded prompt) when the chosen backend is not usable: Ollama is not running, or
     "openrouter"/"hf" is selected without its key. "none" forces the fallback.
+    `max_tokens` caps the length of each reply.
     """
     backend = (backend or os.environ.get("LLM_BACKEND", "ollama")).lower()
     if backend == "none":
@@ -172,13 +180,13 @@ def make_generate(backend: str | None = None):
     if backend == "openrouter":
         if not os.environ.get("OPENROUTER_API_KEY"):
             return make_echo_generate("OPENROUTER_API_KEY is not set")
-        return make_openrouter_generate()
+        return make_openrouter_generate(max_tokens=max_tokens)
     if backend == "hf":
         if not os.environ.get("HF_TOKEN"):
             return make_echo_generate("HF_TOKEN is not set")
-        return make_hf_generate()
+        return make_hf_generate(max_tokens=max_tokens)
     if backend == "ollama":
         if not ollama_available():
             return make_echo_generate("Ollama is not running")
-        return make_ollama_generate()
+        return make_ollama_generate(max_tokens=max_tokens)
     raise RuntimeError(f"Unknown LLM_BACKEND {backend!r}; use one of {', '.join(BACKENDS)}.")

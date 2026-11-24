@@ -38,3 +38,19 @@ def test_parse_args_retrieval_overrides():
 
     args = parse_args(["--chunks", "a.jsonl", "--index", "b.faiss", "--model", "m", "--delay", "10"])
     assert (args.chunks, args.index, args.model, args.delay) == ("a.jsonl", "b.faiss", "m", 10.0)
+
+
+def test_format_entry_shows_finish_reason_and_tokens():
+    info = {"finish_reason": "length", "usage": {
+        "prompt_tokens": 10, "completion_tokens": 400,
+        "completion_tokens_details": {"reasoning_tokens": 390}}}
+    out = format_entry(1, "out-of-scope", {"question": "Q?"}, "ans", [{"source": "y.txt"}], info)
+    assert "- Finish reason: length" in out
+    assert "- Tokens: prompt 10, completion 400, reasoning 390" in out
+
+
+def test_parse_args_max_tokens():
+    from ragdemo.answer_check import parse_args
+
+    assert parse_args([]).max_tokens == 400
+    assert parse_args(["--max-tokens", "1500"]).max_tokens == 1500
