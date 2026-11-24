@@ -47,7 +47,7 @@ The SFTS virus was first isolated from human blood in 2009 in China [1]. Infecti
 - Correct? (yes/no/partly): yes
 - Grounded in the sources? (yes/no): yes
 - Citations point to the right source? (yes/no): yes
-- Notes: First isolated from human blood in 2009 in China; tick bite; human-to-human needs close contact. All match the page. Unlike the MiniLM run, it includes the human-to-human route. Chunk numbering of [1]/[2] not checked.
+- Notes: First isolated from human blood in 2009 in China; tick bite; human-to-human needs close contact. All match the page. The MiniLM run said the same in substance. Chunk numbering of [1]/[2] not checked.
 
 ### 4. When did the UK last have a case of polio caught within the country?
 
