@@ -27,12 +27,12 @@ python -m ragdemo.index      # data/chunks.jsonl -> data/index.faiss
 python -m ragdemo.evaluate   # prints Hit@1/3/5 using eval/eval_questions.csv
 python -m ragdemo.evaluate --misses   # also lists questions whose source was not in the top 5
 python -m ragdemo.chunk_check   # chunk-level hit rate: is the chunk holding the answer in the top k? uses eval/answer_spans.csv
-# index, evaluate and chunk_check accept --model NAME --index PATH to use another embedding model and index file
+# index, evaluate, chunk_check and answer_check accept --model NAME --chunks PATH --index PATH; all but index also accept --query-prefix TEXT
 python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs questions through the LLM for manual marking
 streamlit run app.py
 ```
 
-Only a few modules take command-line arguments: `index`, `evaluate`, `chunk_check` and `answer_check` use argparse with `--model` and `--index` (shared via `index.add_model_args`; `evaluate` also takes `--misses`; `answer_check` also takes `--chunks`, `--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--max-tokens`, `--delay`), and `fetch` uses argparse subcommands. `ingest` and `retrieve` take none. Other settings (chunk `size=200`, `overlap=40`, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
+Only a few modules take command-line arguments: `index`, `evaluate`, `chunk_check` and `answer_check` use argparse with `--model`, `--chunks` and `--index` (shared via `index.add_model_args`, which can also add `--query-prefix`; `evaluate` also takes `--misses`; `answer_check` also takes `--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--max-tokens`, `--delay`), and `fetch` uses argparse subcommands. `ingest` and `retrieve` take none. Other settings (chunk `size=200`, `overlap=40`, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
 
 ## Architecture and invariants
 
