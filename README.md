@@ -54,7 +54,7 @@ streamlit run app.py
 Pages with fewer than 100 words (for example PDF-only or collection pages) and failed requests are skipped and listed at the end. Requests are throttled to stay well under the API rate limit. The manifest records the licence as OGL v3.0; check each page's own licence before relying on it.
 
 ## Connecting an LLM
-`app.py` retrieves the top 3 chunks and sends one grounded prompt (replies capped at 400 tokens) to an LLM chosen by `LLM_BACKEND`:
+`app.py` retrieves the top 3 chunks and sends one grounded prompt (replies capped at 400 tokens, or 1,500 with OpenRouter) to an LLM chosen by `LLM_BACKEND`:
 
 **Local Ollama (default).** Runs `qwen2.5:7b` on your machine, so no data leaves it and there are no API costs.
 ```powershell

@@ -29,7 +29,8 @@ if question:
     hits = get_retriever().search(question, k=3)
     st.subheader("Answer")
     try:
-        st.write(answer(question, hits, make_generate(backend)))
+        cap = 1500 if backend == "openrouter" else 400  # higher cap for OpenRouter; not yet checked against a run
+        st.write(answer(question, hits, make_generate(backend, max_tokens=cap)))
     except Exception as exc:  # noqa: BLE001 - show any backend failure in the UI
         st.error(f"Could not get an answer from the LLM: {exc}")
     st.subheader("Sources")
