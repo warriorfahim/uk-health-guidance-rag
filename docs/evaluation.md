@@ -130,6 +130,20 @@ Summary: 4 of the 6 main-set answers were fully correct, 1 was partly correct an
 - Out-of-scope: 5 of 6 were refused cleanly. The COVID booster question no longer applied the flu booking route to COVID, which both earlier runs did, and it correctly said the NHS will contact people who may be eligible. It still did not say that no locations are given, so the "where" was left unanswered, and I marked it partial. The scabies refusal did not repeat the false "scabies testing" claim from the 200-word bge run.
 - Overall, 400-word chunks with bge gave answers at least as good as the 200-word runs on these 12 questions, with small gains on two out-of-scope questions (COVID booster, scabies), a small loss on the diphtheria answer, and a swap on the care-home answer (a different one of its two parts is kept). This is one run on 12 questions with one marker and is not repeated, so it does not show that 400 words is better, only that it did not hurt.
 
+**Three runs side by side** (same 12 questions, seed, Ollama model and top 3 chunks; the first run used MiniLM retrieval, the other two bge; `results/answer_check_ollama.md`, `results/answer_check_ollama_bge.md`, `results/answer_check_ollama_bge_400.md`). The questions where the runs differ:
+
+| Question | MiniLM, 200 words | bge, 200 words | bge, 400 words |
+|----------|-------------------|----------------|----------------|
+| Measles risk | Wrong (answering chunk not retrieved) | Correct | Correct |
+| Care-home outbreak | Partly (has the "linked by spread" caveat, no 5-day window) | Correct (5-day window, no caveat) | Correct (caveat, no 5-day window) |
+| Diphtheria skin wounds | Correct | Correct | Correct, but one sentence not on the page (marked "partly" grounded) |
+| COVID booster (out of scope) | Partly refused; applied the flu route | Not refused; applied the flu route | Partial; no flu route, but did not say locations are not given |
+| Scabies (out of scope) | Clean refusal | Refusal that falsely said the sources discuss scabies testing | Clean refusal |
+| Main set fully correct | 4 of 6 | 6 of 6 | 6 of 6 |
+| Out-of-scope refused cleanly | 5 of 6 | 4 of 6 | 5 of 6 |
+
+The gap between MiniLM and bge on the main set comes from the model, since MiniLM was not run at 400 words. The two bge runs isolate chunk size, and there 400 words did not hurt. One run per setup, 12 questions, one marker.
+
 ## Failure analysis
 
 Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5. The question about the combined measles, mumps, rubella and chickenpox jab from 2026 expected `universal-varicella-vaccination-programme-in-england.txt`, but 4 of the top 5 chunks came from `mmr-catchup-programme-diagnosis-case-management-and-advice.txt` and one from `pertussis-clinical-and-public-health-management.txt`. The reason has not been investigated.

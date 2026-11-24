@@ -140,6 +140,20 @@ python -m ragdemo.chunk_check --model sentence-transformers/all-MiniLM-L6-v2 --i
 ```
 The bge rows were first produced with a short script before these options existed, and re-running with the options gave the same numbers. The options are for these three commands only; the app and `answer_check` always use the default.
 
+**Answer quality (manual spot check).** `python -m ragdemo.answer_check` sends 12 questions (6 sampled from the main set, 6 out of scope) through retrieval and a local LLM (`qwen2.5:7b` via Ollama), and I marked each answer by hand against the page text. The three runs used the same questions, seed, model and top 3 chunks; only the retrieval setup changed. Rows where they differ:
+
+| Question | MiniLM, 200 words | bge, 200 words | bge, 400 words |
+|----------|-------------------|----------------|----------------|
+| Measles risk | Wrong (answering chunk not retrieved) | Correct | Correct |
+| Care-home outbreak | Partly (has the "linked by spread" caveat, no 5-day window) | Correct (5-day window, no caveat) | Correct (caveat, no 5-day window) |
+| Diphtheria skin wounds | Correct | Correct | Correct, but one sentence not on the page (marked "partly" grounded) |
+| COVID booster (out of scope) | Partly refused; applied the flu route | Not refused; applied the flu route | Partial; no flu route, but did not say locations are not given |
+| Scabies (out of scope) | Clean refusal | Refusal that falsely said the sources discuss scabies testing | Clean refusal |
+| Main set fully correct | 4 of 6 | 6 of 6 | 6 of 6 |
+| Out-of-scope refused cleanly | 5 of 6 | 4 of 6 | 5 of 6 |
+
+With bge retrieval the measles-risk question is answered correctly at both chunk sizes, which MiniLM got wrong. The 400-word run was at least as good as the 200-word bge run, not clearly better. This is one run per setup, 12 questions and one marker, so it is a spot check and not a benchmark. Per-question notes are in `docs/evaluation.md`; raw reports are `results/answer_check_ollama.md`, `results/answer_check_ollama_bge.md` and `results/answer_check_ollama_bge_400.md`.
+
 ## What I learned
 - **Retrieval found the right page.** The baseline scored Hit@5 0.98 on 51 questions, and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts. The local model blended flu and COVID guidance on one boundary question.
 - **The main weakness is at chunk level.** For the measles-risk question the right page came back but not the chunk holding the answer, and Hit@k cannot see that. A chunk-level check with hand-marked answer phrases does see it: with MiniLM on all 51 questions Chunk-Hit@5 was 0.92 (4 misses, including this one), and on the first 21 questions that question was missed at every chunk size I tried.
