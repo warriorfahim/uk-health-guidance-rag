@@ -182,6 +182,13 @@ Summary: 4 of the 6 main-set answers were fully correct, 1 was partly correct an
 
 The gap between MiniLM and bge on the main set comes from the model, since MiniLM was not run at 400 words. The two bge runs isolate chunk size, and there 400 words did not hurt. One run per setup, 12 questions, one marker.
 
+## Default chunk size: decision rule
+
+Written on 2026-11-24, before the 32-question runs (`results/answer_check_ollama_bge_32.md` at 200 words and `results/answer_check_ollama_bge_400_32.md` at 400 words) were read or marked. Both use Ollama (`qwen2.5:7b`), bge retrieval, seed 0 and the top 3 chunks, over 32 in-scope questions (one per page, because `answer_check` picks at most one question per source page, so `--sample 51` gives 32) and the 6 out-of-scope questions. I mark the answers by hand.
+
+- Switch the default to 400-word chunks only if the 400-word run has at least 3 more in-scope answers marked correct than the 200-word run (out of 32), and no more out-of-scope questions that were not refused cleanly (out of 6; a question counts as not refused cleanly if I mark it as not saying the sources lack the answer, or as adding facts from outside the sources).
+- Otherwise the default stays at 200 words, and this section records the result.
+
 ## Failure analysis
 
 Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5. The question about the combined measles, mumps, rubella and chickenpox jab from 2026 expected `universal-varicella-vaccination-programme-in-england.txt`, but 4 of the top 5 chunks came from `mmr-catchup-programme-diagnosis-case-management-and-advice.txt` and one from `pertussis-clinical-and-public-health-management.txt`. The reason has not been investigated.
