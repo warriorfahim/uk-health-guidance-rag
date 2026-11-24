@@ -32,7 +32,7 @@ python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs 
 streamlit run app.py
 ```
 
-Only a few modules take command-line arguments: `index`, `evaluate` and `chunk_check` use argparse with `--model` and `--index` (shared via `index.add_model_args`; `evaluate` also takes `--misses`), `answer_check` uses argparse (`--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--delay`) and always uses the default model and index, and `fetch` uses argparse subcommands. `ingest` and `retrieve` take none. Other settings (chunk `size=200`, `overlap=40`, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
+Only a few modules take command-line arguments: `index`, `evaluate`, `chunk_check` and `answer_check` use argparse with `--model` and `--index` (shared via `index.add_model_args`; `evaluate` also takes `--misses`; `answer_check` also takes `--chunks`, `--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--delay`), and `fetch` uses argparse subcommands. `ingest` and `retrieve` take none. Other settings (chunk `size=200`, `overlap=40`, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
 
 ## Architecture and invariants
 

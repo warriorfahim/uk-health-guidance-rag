@@ -7,6 +7,7 @@ results/answer_check.md for you to read and mark.
     python -m ragdemo.answer_check                 # 6 out-of-scope + 6 sampled questions
     python -m ragdemo.answer_check --sample 8 --seed 1
     $env:LLM_BACKEND = "openrouter"                # optional: pick another backend first
+    python -m ragdemo.answer_check --chunks data/chunks_400.jsonl --index data/index_400.faiss
 """
 import argparse
 import csv
@@ -15,6 +16,8 @@ import random
 import time
 from datetime import date
 from pathlib import Path
+
+from .index import add_model_args
 
 K = 3  # same number of chunks the Streamlit app uses
 
@@ -83,21 +86,28 @@ def format_entry(number: int, kind: str, row: dict, reply: str, hits: list[dict]
     return "\n".join(lines)
 
 
-def main(argv: list[str] | None = None) -> None:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--sample", type=int, default=6, help="questions to sample from the main set")
     parser.add_argument("--seed", type=int, default=0, help="random seed for the sample")
     parser.add_argument("--eval", default="eval/eval_questions.csv")
     parser.add_argument("--out-of-scope", default="eval/out_of_scope_questions.csv")
     parser.add_argument("--out", default="results/answer_check.md")
+    parser.add_argument("--chunks", default="data/chunks.jsonl",
+                        help="chunks file the index was built from (default: data/chunks.jsonl)")
+    add_model_args(parser)
     parser.add_argument("--delay", type=float, default=0.0,
                         help="seconds to pause between questions (helps with rate limits)")
-    args = parser.parse_args(argv)
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = parse_args(argv)
 
     from .llm import make_generate
     from .retrieve import Retriever
 
-    retriever = Retriever()
+    retriever = Retriever(chunks_path=args.chunks, index_path=args.index, model_name=args.model)
     generate = make_generate()
     items = [("in-scope", r) for r in sample_rows(read_rows(args.eval), args.sample, args.seed)]
     items += [("out-of-scope", r) for r in read_rows(args.out_of_scope)]

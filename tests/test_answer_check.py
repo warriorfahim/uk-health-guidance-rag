@@ -21,3 +21,20 @@ def test_describe_backend(monkeypatch):
     assert describe_backend() == "ollama (qwen2.5:7b)"
     monkeypatch.setenv("LLM_BACKEND", "none")
     assert describe_backend() == "none"
+
+
+def test_parse_args_retrieval_defaults():
+    from ragdemo.answer_check import parse_args
+    from ragdemo.index import DEFAULT_MODEL
+
+    args = parse_args([])
+    assert args.chunks == "data/chunks.jsonl"
+    assert args.index == "data/index.faiss"
+    assert args.model == DEFAULT_MODEL
+
+
+def test_parse_args_retrieval_overrides():
+    from ragdemo.answer_check import parse_args
+
+    args = parse_args(["--chunks", "a.jsonl", "--index", "b.faiss", "--model", "m", "--delay", "10"])
+    assert (args.chunks, args.index, args.model, args.delay) == ("a.jsonl", "b.faiss", "m", 10.0)
