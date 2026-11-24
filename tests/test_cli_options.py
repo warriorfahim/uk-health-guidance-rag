@@ -30,3 +30,24 @@ def test_evaluate_parse_args_keeps_misses_flag():
 def test_evaluate_parse_args_model_and_index():
     args = parse_args(["--model", "m", "--index", "i.faiss"])
     assert (args.model, args.index) == ("m", "i.faiss")
+
+
+def test_query_prefix_option_is_opt_in():
+    parser = argparse.ArgumentParser()
+    add_model_args(parser)
+    assert "query_prefix" not in vars(parser.parse_args([]))
+    parser = argparse.ArgumentParser()
+    add_model_args(parser, query_prefix=True)
+    assert parser.parse_args([]).query_prefix == ""
+    assert parser.parse_args(["--query-prefix", "Q: "]).query_prefix == "Q: "
+
+
+def test_evaluate_parse_args_query_prefix():
+    assert parse_args(["--query-prefix", "Q: "]).query_prefix == "Q: "
+
+
+def test_chunks_option_default_and_override():
+    parser = argparse.ArgumentParser()
+    add_model_args(parser)
+    assert parser.parse_args([]).chunks == "data/chunks.jsonl"
+    assert parser.parse_args(["--chunks", "data/chunks_400.jsonl"]).chunks == "data/chunks_400.jsonl"

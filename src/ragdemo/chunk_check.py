@@ -55,7 +55,8 @@ def read_spans(path: str) -> list[dict]:
 
 
 def main(spans_path: str = "eval/answer_spans.csv", ks=(1, 3, 5),
-         model_name: str | None = None, index_path: str = "data/index.faiss") -> None:
+         model_name: str | None = None, index_path: str = "data/index.faiss",
+         query_prefix: str = "", chunks_path: str = "data/chunks.jsonl") -> None:
     rows = read_spans(spans_path)
     filled = [r for r in rows if (r.get("answer_text") or "").strip()]
     print(f"{len(filled)} of {len(rows)} questions have an answer_text in {spans_path}")
@@ -67,8 +68,11 @@ def main(spans_path: str = "eval/answer_spans.csv", ks=(1, 3, 5),
     from .retrieve import Retriever
 
     model_name = model_name or DEFAULT_MODEL
-    print(f"Model: {model_name}, index: {index_path}")
-    retriever = Retriever(index_path=index_path, model_name=model_name)
+    print(f"Model: {model_name}, chunks: {chunks_path}, index: {index_path}")
+    if query_prefix:
+        print(f"Query prefix: {query_prefix!r}")
+    retriever = Retriever(chunks_path=chunks_path, index_path=index_path, model_name=model_name,
+                          query_prefix=query_prefix)
     ranks, not_found, details = [], [], []
     for row in filled:
         question, source, phrase = row["question"], row["expected_source"], row["answer_text"]
@@ -104,6 +108,7 @@ if __name__ == "__main__":
     from .index import add_model_args
 
     parser = argparse.ArgumentParser(description="Chunk-level hit rate (is the answering chunk in the top k?).")
-    add_model_args(parser)
+    add_model_args(parser, query_prefix=True)
     args = parser.parse_args()
-    main(model_name=args.model, index_path=args.index)
+    main(model_name=args.model, index_path=args.index, query_prefix=args.query_prefix,
+         chunks_path=args.chunks)

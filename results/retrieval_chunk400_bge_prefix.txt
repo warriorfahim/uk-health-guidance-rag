@@ -1,0 +1,11 @@
+# Retrieval (page level), bge-small-en-v1.5 with query prefix, 400-word chunks, run on 2026-11-24
+# command: python -m ragdemo.evaluate --misses --chunks data/chunks_400.jsonl --index data/index_400.faiss --query-prefix "Represent this sentence for searching relevant passages: "
+# model=BAAI/bge-small-en-v1.5, query prefix 'Represent this sentence for searching relevant passages: ' (documents indexed without it), chunk size=400 words, overlap=80, 169 chunks, 51 questions
+
+Model: BAAI/bge-small-en-v1.5, chunks: data/chunks_400.jsonl, index: data/index_400.faiss
+Query prefix: 'Represent this sentence for searching relevant passages: '
+Hit@1: 1.00
+Hit@3: 1.00
+Hit@5: 1.00
+
+Missed at k=5: 0 of 51

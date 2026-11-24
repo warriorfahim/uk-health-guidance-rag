@@ -110,9 +110,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--eval", default="eval/eval_questions.csv")
     parser.add_argument("--out-of-scope", default="eval/out_of_scope_questions.csv")
     parser.add_argument("--out", default="results/answer_check.md")
-    parser.add_argument("--chunks", default="data/chunks.jsonl",
-                        help="chunks file the index was built from (default: data/chunks.jsonl)")
-    add_model_args(parser)
+    add_model_args(parser, query_prefix=True)
     parser.add_argument("--max-tokens", type=int, default=400,
                         help="cap on each reply's length in tokens (default: 400)")
     parser.add_argument("--delay", type=float, default=0.0,
@@ -126,7 +124,8 @@ def main(argv: list[str] | None = None) -> None:
     from .llm import make_generate
     from .retrieve import Retriever
 
-    retriever = Retriever(chunks_path=args.chunks, index_path=args.index, model_name=args.model)
+    retriever = Retriever(chunks_path=args.chunks, index_path=args.index, model_name=args.model,
+                          query_prefix=args.query_prefix)
     generate = make_generate(max_tokens=args.max_tokens)
     items = [("in-scope", r) for r in sample_rows(read_rows(args.eval), args.sample, args.seed)]
     items += [("out-of-scope", r) for r in read_rows(args.out_of_scope)]
@@ -146,6 +145,8 @@ def main(argv: list[str] | None = None) -> None:
         f"Sample seed: {args.seed}. Replies are capped at {args.max_tokens} tokens, "
         f"so long answers may be cut off. If an answer starts with 'No LLM available', "
         f"the backend was not running and this is only the grounded prompt.\n\n"
+        f"Retrieval: model {args.model}, chunks {args.chunks}, index {args.index}"
+        f"{', query prefix ' + repr(args.query_prefix) if args.query_prefix else ''}.\n\n"
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
