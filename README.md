@@ -3,7 +3,7 @@
 A small semantic search and retrieval-augmented question answering (RAG) demo over public UK health guidance.
 It retrieves the most relevant passages for a question, answers using only those passages, and shows the sources.
 
-> Status: work in progress. Done: the baseline retrieval run, chunk sizes of 100, 150 and 400 words, a second embedding model (bge-small-en-v1.5, now the default), a test of bge's query prefix, a chunk-level check with hand-marked answer phrases for all 51 questions, the chunk-size runs repeated on all 51 with both models, and manual answer checks (Ollama and OpenRouter on the MiniLM baseline, plus Ollama on bge-retrieved chunks at 200 and at 400 words). Not done: an overlap test, and an answer check on more than 12 questions.
+> Status: work in progress. Done: the baseline retrieval run, chunk sizes of 100, 150 and 400 words, a second embedding model (bge-small-en-v1.5, now the default), a test of bge's query prefix, a chunk-level check with hand-marked answer phrases for all 51 questions, the chunk-size runs repeated on all 51 with both models, and manual answer checks (Ollama and OpenRouter on the MiniLM baseline, plus Ollama on bge-retrieved chunks at 200 and at 400 words). Also done: a 32-question Ollama answer check at 200 and 400 words (default stays at 200 words) and an overlap test of 0, 20, 40 and 80 words (default stays at 40). Not done: a larger answer check with OpenRouter.
 
 ## What it does
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
@@ -166,6 +166,17 @@ The prefix gained 2 questions at one k in each setup (Chunk-Hit@3 at 200 words, 
 With bge retrieval the measles-risk question is answered correctly at both chunk sizes, which MiniLM got wrong. The 400-word run was at least as good as the 200-word bge run, not clearly better. This is one run per setup, 12 questions and one marker, so it is a spot check and not a benchmark. Per-question notes are in `docs/evaluation.md`; raw reports are `results/answer_check_ollama.md`, `results/answer_check_ollama_bge.md` and `results/answer_check_ollama_bge_400.md`.
 
 I also ran the same 12 questions through OpenRouter (free `baidu/ernie-5.5-flash-preview`) with bge retrieval and a 1,500-token reply cap, over 200-word chunks (`results/answer_check_openrouter_bge.md`) and over 400-word chunks (`results/answer_check_openrouter_bge_400.md`). The counts were the same at both sizes (6 of 6 main-set answers, 6 of 6 refusals), with small slips in both directions, so with OpenRouter too 400 words showed no clear gain. All 24 replies finished normally, and in both runs one main-set answer (diphtheria) was marked only partly grounded. The first OpenRouter run (MiniLM retrieval, 400-token cap) had one empty and two cut-off answers. That run changed the embedding model and the cap at once, so it does not show which helped, and it is one run on 12 questions.
+
+**Chunk overlap.** With 200-word chunks and bge, I compared overlaps of 0, 20, 40 (the default) and 80 words on all 51 questions, under a rule written first (change only if Chunk-Hit@3 rises by at least 3 questions; raw output `results/*overlap*_bge.txt`):
+
+| Overlap | Chunks | Hit@3 | Chunk-Hit@3 | Chunk-Hit@5 |
+|---|---|---|---|---|
+| 0 | 271 | 1.00 | 46 of 51 (2 answer phrases fall across a chunk boundary) | 0.98 of 49 checked |
+| 20 | 297 | 1.00 | 46 of 51 | 1.00 |
+| 40 (default) | 330 | 1.00 | 46 of 51 | 0.96 |
+| 80 | 421 | 1.00 | 46 of 51 | 0.94 |
+
+All four settings tie at k=3, so the default stays at 40. Overlap 20 was ahead at k=5 by two questions and not worse anywhere, which I record as a candidate and not a result. It does not change the prompt size (mean 4,219 against 4,228 characters), only the number of chunks. Details are in `docs/evaluation.md`.
 
 ## What I learned
 - **Retrieval found the right page.** The baseline scored Hit@5 0.98 on 51 questions, and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts. The local model blended flu and COVID guidance on one boundary question.

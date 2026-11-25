@@ -1,0 +1,8 @@
+# Retrieval, bge-small-en-v1.5, 200-word chunks, overlap 20, run on 2026-11-25
+# command: python -m ragdemo.evaluate --chunks data/chunks_ov20.jsonl --index data/index_ov20.faiss
+# chunk size=200 words, overlap=20, no query prefix, 297 chunks, 51 questions; chunks built with python -m ragdemo.ingest --size 200 --overlap 20 --out data/chunks_ov20.jsonl and indexed with python -m ragdemo.index --chunks ... --index ...
+
+Model: BAAI/bge-small-en-v1.5, chunks: data/chunks_ov20.jsonl, index: data/index_ov20.faiss
+Hit@1: 1.00
+Hit@3: 1.00
+Hit@5: 1.00

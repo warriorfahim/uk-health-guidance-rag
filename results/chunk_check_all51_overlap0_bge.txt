@@ -1,0 +1,22 @@
+# Chunk-level retrieval check on all 51 questions, bge-small-en-v1.5, 200-word chunks, overlap 0, run on 2026-11-25
+# command: python -m ragdemo.chunk_check --chunks data/chunks_ov0.jsonl --index data/index_ov0.faiss
+# chunk size=200 words, overlap=0, no query prefix, 271 chunks, 51 questions; chunks built with python -m ragdemo.ingest --size 200 --overlap 0 --out data/chunks_ov0.jsonl and indexed with python -m ragdemo.index --chunks ... --index ...
+
+51 of 51 questions have an answer_text in eval/answer_spans.csv
+Model: BAAI/bge-small-en-v1.5, chunks: data/chunks_ov0.jsonl, index: data/index_ov0.faiss
+Checked 49 questions; answer phrase not found in any chunk for 2
+Chunk-Hit@1: 0.67
+Chunk-Hit@3: 0.94
+Chunk-Hit@5: 0.98
+
+Answering chunk not in the top 5: 1 of 49
+- Can you catch tick-borne encephalitis from unpasteurised milk products?
+    answering chunk(s): tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#3
+    got: tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#0, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#6, severe-fever-with-thrombocytopaenia-syndrome-sfts-epidemiology-outbreaks-and-gui.txt#4, crimean-congo-haemorrhagic-fever-origins-reservoirs-transmission-and-guidelines.txt#6, tick-borne-encephalitis-epidemiology-diagnosis-and-prevention.txt#1
+
+Phrase not found in any chunk of the expected page (2):
+(check the spelling, or the phrase may straddle a chunk boundary: use a shorter phrase)
+- I have just come back from a country with Zika and I might be pregnant. What should I do?
+    health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt: 'You should inform your midwife of your travel'
+- What proportion of babies born to mothers infected with Zika in pregnancy end up with problems?
+    health-advice-for-women-returning-from-areas-with-a-risk-of-zika-virus.txt: 'between 4% and 6% of infants born to mothers who have had a Zika virus infection during pregnancy have a birth defect'
