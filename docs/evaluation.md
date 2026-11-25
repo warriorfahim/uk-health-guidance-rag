@@ -232,6 +232,14 @@ No setting reached the 49 of 51 the rule requires, so the default overlap stays 
 
 Overlap does not change the prompt size: the chunk length stays near 200 words and the app sends the top 3. Measured over the 51 questions, the mean prompt was 4,219 characters at overlap 20 and 4,228 at overlap 40. Overlap 20 only gives about 10% fewer chunks to embed and store (297 against 330).
 
+## Hybrid search: decision rule
+
+Written on 2026-11-25, before any hybrid code or run. Hybrid search here means: score every chunk with BM25 (keyword match; k1 1.5, b 0.75; text lower-cased and split into word tokens with the regular expression `\w+`; no stop-word list or stemming), take the top 20 chunks from BM25 and the top 20 from the dense (bge) search, and merge the two lists with reciprocal rank fusion (score is the sum of 1 / (60 + rank) over the lists a chunk appears in), returning the top k. These settings are fixed now and will not be tuned, so there is one hybrid setup and not a search over many. The comparison uses 200-word chunks with overlap 40, bge-small-en-v1.5, no query prefix and the same 51 questions as `evaluate` and `chunk_check`. The control is dense-only retrieval re-run with the same code (expected: page Hit@3 1.00 and Chunk-Hit@3 46 of 51, as in `results/chunk_check_all51_overlap40_bge.txt`). BM25 on its own is also run for reference and does not decide anything.
+
+- Make hybrid the default only if its Chunk-Hit@3 is at least 3 questions higher than the control (49 or more of 51; the app sends the top 3 chunks to the LLM), and neither its page-level Hit@3 nor its Chunk-Hit@1 is lower than the control's.
+- Otherwise hybrid stays an option that is off by default, and the result is recorded here either way.
+- If hybrid wins by this rule, the next step is the 32 + 6 question answer check with Ollama, which is not part of this rule.
+
 ## Failure analysis
 
 Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5. The question about the combined measles, mumps, rubella and chickenpox jab from 2026 expected `universal-varicella-vaccination-programme-in-england.txt`, but 4 of the top 5 chunks came from `mmr-catchup-programme-diagnosis-case-management-and-advice.txt` and one from `pertussis-clinical-and-public-health-management.txt`. The reason has not been investigated.
