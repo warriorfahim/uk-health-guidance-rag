@@ -182,6 +182,15 @@ Summary: 4 of the 6 main-set answers were fully correct, 1 was partly correct an
 
 The gap between MiniLM and bge on the main set comes from the model, since MiniLM was not run at 400 words. The two bge runs isolate chunk size, and there 400 words did not hurt. One run per setup, 12 questions, one marker.
 
+**OpenRouter with bge, same 32 + 6 questions** (`results/answer_check_openrouter_bge_32.md`, run on 2026-11-25): the same questions and seed as the two Ollama 32-question reports, with the free OpenRouter model, 200-word chunks and a 1,500-token cap. I marked the answers by hand against the page text in `data/raw/`. All 38 replies finished with reason `stop` (the longest used 599 completion tokens).
+
+| | Ollama, 200 words | Ollama, 400 words | OpenRouter, 200 words |
+|---|---|---|---|
+| In-scope answers marked correct (of 32) | 31 | 30 (2 partly) | 31 |
+| Out-of-scope refused cleanly (of 6) | 4 | 5 | 6 |
+
+OpenRouter had 1 in-scope answer marked wrong (the cold-weather temperature question, which says no temperature is given although the page gives prolonged periods below 2 degrees C as an example; Ollama at 200 words was marked wrong on the same question), and one marked only partly grounded (the plague question: it gave only the respiratory route and applied the page's close-contact point about pneumonic plague patients to infected cats). All 32 citations were marked as pointing to the right source. On the out-of-scope questions it refused all 6, including the COVID booster question that neither Ollama run refused (it said no location is given and that the booking options in the source apply to flu). Its answers were often longer than needed (the Zika, diphtheria skin wound and SFTS answers in particular), which I marked down in notes but not as errors. This is one run per backend with one marker, so it shows the OpenRouter model was at least as good as Ollama here, not that it is better.
+
 ## Default chunk size: decision rule
 
 Written on 2026-11-24, before the 32-question runs (`results/answer_check_ollama_bge_32.md` at 200 words and `results/answer_check_ollama_bge_400_32.md` at 400 words) were read or marked. Both use Ollama (`qwen2.5:7b`), bge retrieval, seed 0 and the top 3 chunks, over 32 in-scope questions (one per page, because `answer_check` picks at most one question per source page, so `--sample 51` gives 32) and the 6 out-of-scope questions. I mark the answers by hand.
