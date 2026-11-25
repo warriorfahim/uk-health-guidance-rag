@@ -31,23 +31,25 @@ def parse_args(argv: list[str] | None = None):
     parser = argparse.ArgumentParser(description="Hit@k on the retrieval eval set.")
     parser.add_argument("--misses", action="store_true",
                         help="also list questions whose source was not in the top 5")
-    add_model_args(parser, query_prefix=True)
+    add_model_args(parser, query_prefix=True, mode=True)
     return parser.parse_args(argv)
 
 
 def main(
     eval_path: str = "eval/eval_questions.csv", ks=(1, 3, 5), show_misses: bool = False,
     model_name: str | None = None, index_path: str = "data/index.faiss", query_prefix: str = "",
-    chunks_path: str = "data/chunks.jsonl",
+    chunks_path: str = "data/chunks.jsonl", mode: str = "dense",
 ) -> None:
     from .index import DEFAULT_MODEL
     from .retrieve import Retriever
     model_name = model_name or DEFAULT_MODEL
     print(f"Model: {model_name}, chunks: {chunks_path}, index: {index_path}")
+    if mode != "dense":
+        print(f"Search mode: {mode}")
     if query_prefix:
         print(f"Query prefix: {query_prefix!r}")
     retriever = Retriever(chunks_path=chunks_path, index_path=index_path, model_name=model_name,
-                          query_prefix=query_prefix)
+                          query_prefix=query_prefix, mode=mode)
     questions, expected = [], []
     with open(eval_path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -67,4 +69,4 @@ def main(
 if __name__ == "__main__":
     args = parse_args()
     main(show_misses=args.misses, model_name=args.model, index_path=args.index,
-         query_prefix=args.query_prefix, chunks_path=args.chunks)
+         query_prefix=args.query_prefix, chunks_path=args.chunks, mode=args.mode)

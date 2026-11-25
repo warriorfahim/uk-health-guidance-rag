@@ -1,0 +1,11 @@
+# Retrieval, BM25 only (reference), bge-small-en-v1.5, 200-word chunks (overlap 40, 330 chunks), run on 2026-11-25
+# command: python -m ragdemo.evaluate --misses --mode bm25
+# no query prefix, 51 questions; hybrid settings fixed in advance (BM25 k1 1.5, b 0.75; top 20 from each list; reciprocal rank fusion constant 60); see docs/evaluation.md
+
+Model: BAAI/bge-small-en-v1.5, chunks: data/chunks.jsonl, index: data/index.faiss
+Search mode: bm25
+Hit@1: 0.88
+Hit@3: 1.00
+Hit@5: 1.00
+
+Missed at k=5: 0 of 51

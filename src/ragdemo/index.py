@@ -8,11 +8,12 @@ DEFAULT_MODEL = "BAAI/bge-small-en-v1.5"  # was all-MiniLM-L6-v2 until 2026-11-2
 BGE_QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 
 
-def add_model_args(parser, query_prefix: bool = False) -> None:
+def add_model_args(parser, query_prefix: bool = False, mode: bool = False) -> None:
     """Add --model, --chunks and --index options (shared by index, evaluate, chunk_check and answer_check).
 
     With `query_prefix=True` also add --query-prefix, text put in front of each question before it
-    is embedded (the index itself is not changed, so it needs no rebuild).
+    is embedded (the index itself is not changed, so it needs no rebuild). With `mode=True` also add
+    --mode (dense, bm25 or hybrid), how chunks are searched.
     """
     parser.add_argument("--model", default=DEFAULT_MODEL,
                         help=f"embedding model name (default: {DEFAULT_MODEL})")
@@ -20,6 +21,9 @@ def add_model_args(parser, query_prefix: bool = False) -> None:
                         help="chunks file to embed or search (default: data/chunks.jsonl)")
     parser.add_argument("--index", default="data/index.faiss",
                         help="FAISS index file to write or read (default: data/index.faiss)")
+    if mode:
+        parser.add_argument("--mode", choices=("dense", "bm25", "hybrid"), default="dense",
+                            help="how to search: dense (default), bm25 keywords only, or hybrid of both")
     if query_prefix:
         parser.add_argument("--query-prefix", default="",
                             help="text put before each question when searching (default: none; "

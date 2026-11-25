@@ -18,7 +18,7 @@ data/chunks.jsonl
    │  index.py    (sentence-transformers embeddings → FAISS)
    ▼
 data/index.faiss
-   │  retrieve.py (embed query, top-k cosine similarity)
+   │  retrieve.py (embed query, top-k cosine similarity; optional BM25 / hybrid)
    ▼
 top-k chunks
    │  answer.py   (grounded prompt with numbered sources)
@@ -35,7 +35,8 @@ answer with citations  →  app.py (Streamlit UI)
 | `chunking.py` | Split text into overlapping chunks | Word-based: default 200 words with 40 overlap, split on whitespace. |
 | `ingest.py` | Read raw pages, write `chunks.jsonl` | One record per chunk: `source` (file name), `chunk_id`, `text`. Pages are read in sorted order. |
 | `index.py` | Embed chunks, build FAISS index | `BAAI/bge-small-en-v1.5` embeddings by default (`--model` / `--chunks` / `--index` to change), normalised, in an `IndexFlatIP` (cosine similarity). |
-| `retrieve.py` | Semantic search over the index | Embeds the query with the same model (optionally with a query prefix); returns copies of the chunk records plus a `score`. |
+| `retrieve.py` | Search over the index | Dense by default: embeds the query with the same model (optionally with a query prefix); returns copies of the chunk records plus a `score`. `mode="bm25"` or `"hybrid"` (via `hybrid.py`) is opt-in and off in the app. |
+| `hybrid.py` | BM25 keyword scoring and rank fusion | Standard library only. BM25 (k1 1.5, b 0.75) over the chunk text, built in memory when the retriever loads, and reciprocal rank fusion (constant 60) of the top 20 from BM25 and the top 20 from dense search. Settings fixed before the comparison. |
 | `answer.py` | Build the grounded prompt | Numbered sources `[1] (file) text`, and rules to use only the sources, cite them, and say when they do not contain the answer. |
 | `llm.py` | LLM backends as `generate(prompt) -> str` | `ollama` (default), `openrouter`, `hf` (not supported) and `none`; falls back to echoing the prompt when a backend is unusable. |
 | `evaluate.py` | Hit@k on the retrieval eval set | Page-level metric. `--misses` lists failed questions. |
@@ -82,4 +83,4 @@ What the code does, and why. The reasons for chunking and the index were drafted
 - Answer quality was judged by one person on 12 questions per model, so it is a spot check, not a benchmark.
 - Grounding relies on the prompt alone; there is no automatic check that an answer is supported by the sources or that its citations are correct.
 - A chunk-level check (`chunk_check.py`, `eval/answer_spans.csv`) exists and all 51 questions now have a hand-written answer phrase. Across chunk sizes it gives Chunk-Hit@5 of 0.88, 0.88, 0.92 and 0.96 (MiniLM) and 0.88, 0.90, 0.96 and 1.00 (bge) at 100, 150, 200 and 400 words, so larger chunks retrieve the answering chunk more often, partly because they are an easier target; see `docs/evaluation.md`.
-- Future work: the larger answer check (32 in-scope and 6 out-of-scope questions) has been done with Ollama at 200 and 400 words and with OpenRouter at 200 words; the default stays at 200 words. Optional, low value: the same check with OpenRouter at 400 words (`--chunks data/chunks_400.jsonl --index data/index_400.faiss`), which would complete the pairing with Ollama; the default chunk size is already settled, so it would not change anything. Overlap was tested at 0, 20, 40 and 80 words and the default stays at 40.
+- Future work: the larger answer check (32 in-scope and 6 out-of-scope questions) has been done with Ollama at 200 and 400 words and with OpenRouter at 200 words; the default stays at 200 words. Optional, low value: the same check with OpenRouter at 400 words (`--chunks data/chunks_400.jsonl --index data/index_400.faiss`), which would complete the pairing with Ollama; the default chunk size is already settled, so it would not change anything. Overlap was tested at 0, 20, 40 and 80 words and the default stays at 40. Hybrid search was implemented and compared (`--mode hybrid`); it did not meet the rule to become the default (Chunk-Hit@3 47 against 46 of 51, 49 needed), so it stays off by default.

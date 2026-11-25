@@ -51,3 +51,18 @@ def test_chunks_option_default_and_override():
     add_model_args(parser)
     assert parser.parse_args([]).chunks == "data/chunks.jsonl"
     assert parser.parse_args(["--chunks", "data/chunks_400.jsonl"]).chunks == "data/chunks_400.jsonl"
+
+
+def test_mode_option_is_opt_in_and_defaults_to_dense():
+    parser = argparse.ArgumentParser()
+    add_model_args(parser)
+    assert "mode" not in vars(parser.parse_args([]))
+    parser = argparse.ArgumentParser()
+    add_model_args(parser, mode=True)
+    assert parser.parse_args([]).mode == "dense"
+    assert parser.parse_args(["--mode", "hybrid"]).mode == "hybrid"
+
+
+def test_evaluate_parse_args_mode():
+    assert parse_args([]).mode == "dense"
+    assert parse_args(["--mode", "bm25"]).mode == "bm25"

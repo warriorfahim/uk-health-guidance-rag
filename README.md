@@ -3,7 +3,7 @@
 A small semantic search and retrieval-augmented question answering (RAG) demo over public UK health guidance.
 It retrieves the most relevant passages for a question, answers using only those passages, and shows the sources.
 
-> Status: work in progress. Done: the baseline retrieval run, chunk sizes of 100, 150 and 400 words, a second embedding model (bge-small-en-v1.5, now the default), a test of bge's query prefix, a chunk-level check with hand-marked answer phrases for all 51 questions, the chunk-size runs repeated on all 51 with both models, and manual answer checks (Ollama and OpenRouter on the MiniLM baseline, plus Ollama on bge-retrieved chunks at 200 and at 400 words). Also done: a 32-question Ollama answer check at 200 and 400 words (default stays at 200 words) and an overlap test of 0, 20, 40 and 80 words (default stays at 40). Also done: the same 32 + 6 question check with OpenRouter. Not done: an OpenRouter check at 400 words.
+> Status: work in progress. Done: the baseline retrieval run, chunk sizes of 100, 150 and 400 words, a second embedding model (bge-small-en-v1.5, now the default), a test of bge's query prefix, a chunk-level check with hand-marked answer phrases for all 51 questions, the chunk-size runs repeated on all 51 with both models, and manual answer checks (Ollama and OpenRouter on the MiniLM baseline, plus Ollama on bge-retrieved chunks at 200 and at 400 words). Also done: a 32-question Ollama answer check at 200 and 400 words (default stays at 200 words) and an overlap test of 0, 20, 40 and 80 words (default stays at 40). Also done: the same 32 + 6 question check with OpenRouter. Also done: BM25 and hybrid search as an opt-in mode, compared on all 51 questions (not adopted as the default). Not done: an OpenRouter check at 400 words.
 
 ## What it does
 1. Downloads public GOV.UK guidance pages as plain text (optional helper), then splits them into overlapping chunks.
@@ -177,6 +177,8 @@ I also ran the same 12 questions through OpenRouter (free `baidu/ernie-5.5-flash
 | 80 | 421 | 1.00 | 46 of 51 | 0.94 |
 
 All four settings tie at k=3, so the default stays at 40. Overlap 20 was ahead at k=5 by two questions and not worse anywhere, which I record as a candidate and not a result. It does not change the prompt size (mean 4,219 against 4,228 characters), only the number of chunks. Details are in `docs/evaluation.md`.
+
+**Hybrid search.** I added BM25 keyword search and a hybrid of BM25 and dense search (reciprocal rank fusion), off by default (`--mode bm25|hybrid` on `evaluate`, `chunk_check` and `answer_check`). The settings and the adoption rule were fixed before the run. On all 51 questions at 200 words, hybrid put the answering chunk first for many more questions than dense (Chunk-Hit@1 44 against 33 of 51) but was only one question ahead at k=3 (47 against 46 of 51, 49 needed), so dense stays the default. BM25 alone scored 48 at k=3, probably helped by questions that share wording with the pages. One run, one question set; details and raw output in `docs/evaluation.md` and `results/*hybrid*`.
 
 ## What I learned
 - **Retrieval found the right page.** The baseline scored Hit@5 0.98 on 51 questions, and in a manual spot check both a local and a hosted LLM refused most out-of-scope questions clearly and did not invent facts. The local model blended flu and COVID guidance on one boundary question.

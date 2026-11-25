@@ -240,6 +240,18 @@ Written on 2026-11-25, before any hybrid code or run. Hybrid search here means: 
 - Otherwise hybrid stays an option that is off by default, and the result is recorded here either way.
 - If hybrid wins by this rule, the next step is the 32 + 6 question answer check with Ollama, which is not part of this rule.
 
+## Hybrid search: result
+
+Run on 2026-11-25 under the rule above (200-word chunks, overlap 40, bge-small-en-v1.5, no query prefix, 51 questions; raw output in `results/retrieval_hybrid_{dense,bm25,hybrid}.txt` and `results/chunk_check_all51_hybrid_{dense,bm25,hybrid}.txt`). The dense control reproduced the earlier overlap-40 numbers exactly.
+
+| Mode | Hit@1 / @3 / @5 (page) | Chunk-Hit@1 | Chunk-Hit@3 | Chunk-Hit@5 | Answering chunk missed at k=5 |
+|---|---|---|---|---|---|
+| Dense only (control) | 0.98 / 1.00 / 1.00 | 0.65 (33 of 51) | 0.90 (46 of 51) | 0.96 | 2 |
+| BM25 only (reference) | 0.88 / 1.00 / 1.00 | 0.69 (35 of 51) | 0.94 (48 of 51) | 0.96 | 2 |
+| Hybrid | 1.00 / 1.00 / 1.00 | 0.86 (44 of 51) | 0.92 (47 of 51) | 0.96 | 2 |
+
+The rule required Chunk-Hit@3 of at least 49 of 51 for hybrid, and it got 47 (one question above the control), so hybrid stays an option that is off by default (`--mode hybrid`) and the app is unchanged. Page-level Hit@3 and Chunk-Hit@1 were not lower, so those conditions were met. The clear difference is at k=1: hybrid had the answering chunk first for 11 more questions than dense (44 against 33 of 51). The app sends the top 3 chunks, and by k=3 the gap is 1 question, so I read this as a better ordering but not a better answer set for the LLM. At k=5 all three modes are at 0.96. BM25 alone scored higher than hybrid at k=3 (48 of 51). The eval questions were written by hand while reading the pages, so they share wording with the pages, which favours keyword matching; a question set written by someone who had not read the pages could give a different picture, and I did not test one. This is a single run on one question set, with the hybrid settings fixed beforehand and not tuned. Implementation detail not in the rule: each distinct query word counts once in the BM25 score. The scores shown by the app for hybrid would be fused rank scores, not cosine similarities, which is another reason it is not wired into the app.
+
 ## Failure analysis
 
 Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5. The question about the combined measles, mumps, rubella and chickenpox jab from 2026 expected `universal-varicella-vaccination-programme-in-england.txt`, but 4 of the top 5 chunks came from `mmr-catchup-programme-diagnosis-case-management-and-advice.txt` and one from `pertussis-clinical-and-public-health-management.txt`. The reason has not been investigated.
