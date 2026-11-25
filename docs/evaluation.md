@@ -200,6 +200,14 @@ Marked by hand on 2026-11-25 (`results/answer_check_ollama_bge_32.md` at 200 wor
 
 The 400-word run had 1 fewer correct in-scope answer, not the 3 more the rule requires, so the default stays at 200 words. Differences were small and mixed. At 200 words, the temperature question (cold-weather risk) was marked wrong because the answer said the page gives no temperature although it gives prolonged periods below 2 degrees C as an example. At 400 words the same question was marked partly, since the answer said no exact temperature was given and then quoted the 2 degrees C example. The Zika-in-pregnancy question was marked partly at 400 words because it opened with advice on delaying pregnancy that does not suit someone who may already be pregnant. On the out-of-scope questions, the COVID booster question was not refused at either size (the 200-word answer applied the flu booking route, the 400-word one gave advice for managerial and patient-facing staff), and the scabies question was refused at 200 words with a false claim that the sources discuss scabies testing, but cleanly at 400 words. A one-question difference on one run with one marker is within noise, so this shows no benefit from 400-word chunks with Ollama and no harm either.
 
+## Chunk overlap: decision rule
+
+Written on 2026-11-25, before any overlap run. The chunk size stays at 200 words, with bge-small-en-v1.5, no query prefix, and the same 51 questions. I will build one chunks file and index per overlap (0, 20 and 80 words; `python -m ragdemo.ingest --size 200 --overlap N --out data/chunks_ovN.jsonl`, then `python -m ragdemo.index --chunks ... --index data/index_ovN.faiss`), and run `evaluate` and `chunk_check` on each. The current setting, overlap 40 (330 chunks, `results/retrieval_bge_small.txt` and `results/chunk_check_all51_bge.txt`: Chunk-Hit@3 0.90, which is 46 of 51), is the control and is re-run with the same code for the comparison.
+
+- Change the default overlap only if one setting gets Chunk-Hit@3 at least 3 questions higher than overlap 40 (so 49 or more of 51), and its page-level Hit@3 is not lower. A question whose answer phrase is found in no chunk counts as a miss, so a setting cannot win by dropping hard questions.
+- Otherwise the default stays at 40, and the result is recorded here.
+- Chunk-Hit@3 is the deciding number because the app sends the top 3 chunks to the LLM. Other k values and the chunk counts are reported but do not decide.
+
 ## Failure analysis
 
 Baseline run (`results/retrieval_baseline.txt`): 1 of 51 questions missed at k=5. The question about the combined measles, mumps, rubella and chickenpox jab from 2026 expected `universal-varicella-vaccination-programme-in-england.txt`, but 4 of the top 5 chunks came from `mmr-catchup-programme-diagnosis-case-management-and-advice.txt` and one from `pertussis-clinical-and-public-health-management.txt`. The reason has not been investigated.

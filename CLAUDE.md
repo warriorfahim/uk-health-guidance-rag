@@ -22,7 +22,7 @@ pytest -q                                      # all tests
 pytest tests/test_chunking.py::test_chunks_overlap   # single test
 
 # Pipeline (run from repo root; all paths are relative to CWD)
-python -m ragdemo.ingest     # data/raw/*.txt -> data/chunks.jsonl
+python -m ragdemo.ingest     # data/raw/*.txt -> data/chunks.jsonl (options: --raw, --out, --size, --overlap)
 python -m ragdemo.index      # data/chunks.jsonl -> data/index.faiss
 python -m ragdemo.evaluate   # prints Hit@1/3/5 using eval/eval_questions.csv
 python -m ragdemo.evaluate --misses   # also lists questions whose source was not in the top 5
@@ -32,7 +32,7 @@ python -m ragdemo.answer_check --out results/answer_check_<backend>.md   # runs 
 streamlit run app.py
 ```
 
-Only a few modules take command-line arguments: `index`, `evaluate`, `chunk_check` and `answer_check` use argparse with `--model`, `--chunks` and `--index` (shared via `index.add_model_args`, which can also add `--query-prefix`; `evaluate` also takes `--misses`; `answer_check` also takes `--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--max-tokens`, `--delay`), and `fetch` uses argparse subcommands. `ingest` and `retrieve` take none. Other settings (chunk `size=200`, `overlap=40`, paths) are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
+Only a few modules take command-line arguments: `index`, `evaluate`, `chunk_check` and `answer_check` use argparse with `--model`, `--chunks` and `--index` (shared via `index.add_model_args`, which can also add `--query-prefix`; `evaluate` also takes `--misses`; `answer_check` also takes `--sample`, `--seed`, `--eval`, `--out-of-scope`, `--out`, `--max-tokens`, `--delay`), `ingest` uses argparse with `--raw`, `--out`, `--size` and `--overlap`, and `fetch` uses argparse subcommands. `retrieve` takes none. Other settings are keyword defaults on each module's `main()`. To try a different setup, call `main(...)` with arguments or change the defaults.
 
 ## Architecture and invariants
 

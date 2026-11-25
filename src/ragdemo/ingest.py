@@ -26,4 +26,12 @@ def main(raw_dir: str = "data/raw", out_path: str = "data/chunks.jsonl",
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Split pages into overlapping word chunks.")
+    parser.add_argument("--raw", default="data/raw", help="folder of .txt pages")
+    parser.add_argument("--out", default="data/chunks.jsonl", help="chunks file to write")
+    parser.add_argument("--size", type=int, default=200, help="words per chunk")
+    parser.add_argument("--overlap", type=int, default=40, help="words shared with the previous chunk")
+    args = parser.parse_args()
+    main(raw_dir=args.raw, out_path=args.out, size=args.size, overlap=args.overlap)
