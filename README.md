@@ -16,7 +16,7 @@ It retrieves the most relevant passages for a question, answers using only those
 
 ## Project layout
 ```
-src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, llm, evaluate, chunk_check, answer_check
+src/ragdemo/   fetch, chunking, ingest, index, retrieve, answer, llm, service, api, evaluate, chunk_check, answer_check
 app.py         Streamlit interface
 tests/         unit tests (run in CI, no model downloads needed)
 data/raw/      cleaned .txt guidance pages (not committed; `fetch` can create these)
@@ -45,6 +45,22 @@ python -m ragdemo.chunk_check       # is the chunk holding the answer in the top
 python -m ragdemo.answer_check --out results/answer_check_ollama.md   # needs an LLM backend (see below)
 streamlit run app.py
 ```
+
+## API and Docker
+A FastAPI service gives the same retrieval and grounded answer over HTTP. Build the data first (`ragdemo.ingest`, then `ragdemo.index`).
+```powershell
+pip install -r requirements.txt -r requirements-dev.txt
+pip install -e .
+uvicorn ragdemo.api:app          # interactive docs at http://127.0.0.1:8000/docs
+```
+`GET /health` says the process is up. `POST /ask` takes `{"question": "...", "k": 3}` and returns `answer`, `llm_used` and the numbered `sources`. If no LLM is usable, `answer` is null and the sources are still returned. The server's `LLM_BACKEND` setting chooses the LLM.
+
+With Docker (the image does not contain the data, so mount it):
+```powershell
+docker build -t uk-health-rag .
+docker run --rm -p 127.0.0.1:8000:8000 -v "${PWD}/data:/app/data:ro" -e OLLAMA_URL=http://host.docker.internal:11434 uk-health-rag
+```
+The service has no authentication or rate limiting, so keep it on your own machine until those are added.
 
 ## Fetching data
 `ragdemo.fetch` uses only the standard library and two free GOV.UK APIs (no key needed):
