@@ -47,7 +47,7 @@ streamlit run app.py
 ```
 
 ## API and Docker
-The Docker image has not been built or tested yet.
+The Docker image was built and run in GitHub Codespaces on 26 November 2026 with OpenRouter, and checked with one question. It has not been tested with Ollama or deployed publicly.
 
 A FastAPI service gives the same retrieval and grounded answer over HTTP. Build the data first (`ragdemo.ingest`, then `ragdemo.index`).
 ```powershell
