@@ -47,6 +47,8 @@ streamlit run app.py
 ```
 
 ## API and Docker
+The Docker image has not been built or tested yet.
+
 A FastAPI service gives the same retrieval and grounded answer over HTTP. Build the data first (`ragdemo.ingest`, then `ragdemo.index`).
 ```powershell
 pip install -r requirements.txt -r requirements-dev.txt
